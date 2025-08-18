@@ -34,4 +34,8 @@ public class TeamMembers {
 
     @Column(name = "join_at", nullable = false)
     private LocalDateTime joinAt;
+
+    public void updateRole(String role) {
+        this.role = role;
+    }
 }

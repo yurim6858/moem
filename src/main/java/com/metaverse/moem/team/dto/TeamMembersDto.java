@@ -1,6 +1,5 @@
 package com.metaverse.moem.team.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class TeamMembersDto {
@@ -8,7 +7,7 @@ public class TeamMembersDto {
     // 팀원 생성 요청
     public record CreateReq(
             @NotNull Long teamId, // 소속 team Id
-            @NotBlank String name,
+            @NotNull Long userId,
             String role // 역할 정보
     ) {}
 

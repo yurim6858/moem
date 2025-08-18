@@ -1,4 +1,4 @@
-package com.metaverse.moem.team.respository;
+package com.metaverse.moem.team.repository;
 
 import com.metaverse.moem.team.domain.Team;
 import org.springframework.data.jpa.repository.JpaRepository;

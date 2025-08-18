@@ -27,6 +27,10 @@ public class TeamMembers {
     private Long userId;
 
     @Column(length = 20, nullable = false)
+    private String name;
+
+
+    @Column(length = 20, nullable = false)
     private String role;
 
     @Column(length = 20, nullable = false)
@@ -38,4 +42,9 @@ public class TeamMembers {
     public void updateRole(String role) {
         this.role = role;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
 }

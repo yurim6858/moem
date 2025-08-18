@@ -60,12 +60,17 @@ public class TeamMembersService {
             member.updateRole(req.role());
         }
 
+        if (req.name() != null) {
+            member.updateName(req.name());
+        }
+
+
         User user = userRepository.findById(member.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         return new TeamMembersDto.Res(
                 member.getId(),
-                user.getName(),
+                member.getName(),
                 member.getRole(),
                 member.getTeam().getId(),
                 member.getJoinAt().toString(),

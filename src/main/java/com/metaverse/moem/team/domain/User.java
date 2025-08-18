@@ -11,7 +11,7 @@ import lombok.*;
 @Table(name = "user")
 public class User {
     @Id
-    private long id;
+    private Long id;
 
     @Column(length = 120, nullable = false)
     private String email;

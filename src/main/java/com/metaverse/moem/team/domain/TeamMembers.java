@@ -24,7 +24,7 @@ public class TeamMembers {
 
     // user FK 연관관계
     @Column(name = "user_id", nullable = false)
-    private long userId;
+    private Long userId;
 
     @Column(length = 20, nullable = false)
     private String role;

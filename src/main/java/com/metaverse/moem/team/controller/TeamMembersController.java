@@ -34,13 +34,11 @@ public class TeamMembersController {
     public TeamMembersDto.Res update(@PathVariable Long teamId,
                                      @PathVariable Long memberId,
                                      @RequestBody @Valid TeamMembersDto.UpdateReq req) {
-
-        TeamMembersDto.UpdateReq updateReq = new TeamMembersDto.UpdateReq(memberId, req.name(), req.role());
-        return teamMembersService.update(updateReq);
+        return teamMembersService.update(memberId, req);
     }
 
     // 팀원 삭제
-    @DeleteMapping
+    @DeleteMapping("/{memberId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long teamId, @PathVariable Long memberId) {
         teamMembersService.delete(new TeamMembersDto.DeleteReq(memberId));

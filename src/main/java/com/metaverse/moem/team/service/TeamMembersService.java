@@ -52,8 +52,8 @@ public class TeamMembersService {
     }
 
     // 팀원 수정
-    public TeamMembersDto.Res update(TeamMembersDto.UpdateReq req) {
-        TeamMembers member = teamMembersRepository.findById(req.id())
+    public TeamMembersDto.Res update(Long memberId, TeamMembersDto.UpdateReq req) {
+        TeamMembers member = teamMembersRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀원이 존재하지 않습니다."));
 
         if (req.role() != null) {

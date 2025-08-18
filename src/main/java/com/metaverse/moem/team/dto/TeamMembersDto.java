@@ -12,8 +12,7 @@ public class TeamMembersDto {
     ) {}
 
     // 팀원 수정 요청
-    public record  UpdateReq(
-            @NotNull Long id, // 수정대성 member의 id
+    public record UpdateReq(
             String name,
             String role
     ) {}

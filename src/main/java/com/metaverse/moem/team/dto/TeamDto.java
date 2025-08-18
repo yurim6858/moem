@@ -1,6 +1,8 @@
 package com.metaverse.moem.team.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 public class TeamDto {
 
@@ -14,6 +16,11 @@ public class TeamDto {
     public record  UpdateReq(
             @NotBlank @Size(max = 60) String name,
             @Size(max = 255) String description
+    ) {}
+
+    // 팀 삭제 요청
+    public record  DeleteReq(
+            @NotNull Long id
     ) {}
 
     // 팀 응답 (API 결과 반환시 사용)

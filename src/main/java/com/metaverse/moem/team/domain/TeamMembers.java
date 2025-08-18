@@ -15,7 +15,7 @@ public class TeamMembers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     // team FK 연관관계
     @ManyToOne(fetch = FetchType.LAZY)

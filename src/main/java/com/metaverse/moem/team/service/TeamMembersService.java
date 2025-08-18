@@ -24,8 +24,8 @@ public class TeamMembersService {
     private final UserRepository userRepository;
 
     // 팀원 생성
-    public TeamMembersDto.Res create(TeamMembersDto.CreateReq req) {
-        Team team = teamRepository.findById(req.teamId())
+    public TeamMembersDto.Res create(Long teamId, TeamMembersDto.CreateReq req) {
+        Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀이 존재하지 않습니다."));
 
         User user = userRepository.findById(req.userId())

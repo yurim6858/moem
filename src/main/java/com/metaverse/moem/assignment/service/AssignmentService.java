@@ -28,14 +28,14 @@ public class AssignmentService {
         return toRes(saved);
     }
 
-    public List<AssignmentDto.Res> getByProjectId(Long projectId) {
-        return assignmentRepository.findByProjectId(projectId).stream()
+    public List<AssignmentDto.Res> getByProject(Long projectId) {
+        return assignmentRepository.findAllByProjectId(projectId).stream()
                 .map(this::toRes)
                 .toList();
     }
 
     public List<AssignmentDto.Res> getByProjectAndUser(Long projectId, Long userId) {
-        return assignmentRepository.findByProjectIdAndUserId(projectId, userId).stream()
+        return assignmentRepository.findAllByProjectIdAndUserId(projectId, userId).stream()
                 .map(this::toRes)
                 .toList();
     }

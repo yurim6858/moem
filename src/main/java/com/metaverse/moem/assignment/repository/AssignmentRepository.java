@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
-    List<Assignment> findByProjectId(Long projectId);
-    List<Assignment> findByProjectIdAndUserId(Long projectId, Long userId);
+    List<Assignment> findAllByProjectId(Long projectId);
+    List<Assignment> findAllByProjectIdAndUserId(Long projectId, Long userId);
 }

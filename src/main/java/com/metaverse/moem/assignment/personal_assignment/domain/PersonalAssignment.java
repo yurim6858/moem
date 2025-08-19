@@ -3,11 +3,13 @@ package com.metaverse.moem.assignment.personal_assignment.domain;
 import com.metaverse.moem.assignment.team_assignment.domain.TeamAssignment;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.cglib.core.Local;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,6 +36,11 @@ public class PersonalAssignment {
 
     @Column(nullable = false)
     private LocalDateTime dueAt;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
 
     // 직접 생성한 과제
     @Column(nullable = false)

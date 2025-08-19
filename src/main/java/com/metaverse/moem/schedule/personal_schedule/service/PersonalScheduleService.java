@@ -42,7 +42,7 @@ public class PersonalScheduleService {
     }
 
     private PersonalScheduleDto.AssignmentStatus calculateStatus(LocalDateTime dueAt, LocalDateTime createdAt, LocalDateTime now) {
-        if (createdAt.toLocalDate().isEqual(now.toLocalDate())) {
+        if (createdAt != null && createdAt.toLocalDate().isEqual(now.toLocalDate())) {
             return PersonalScheduleDto.AssignmentStatus.신규;
         }
 

@@ -7,6 +7,7 @@ import com.metaverse.moem.assignment.team_assignment.domain.TeamAssignment;
 import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class PersonalAssignmentService {
     }
 
     // 직접 생성한 과제만 수정
+    @Transactional
     public PersonalAssignmentDto.Res update(Long id, PersonalAssignmentDto.UpdateReq req) {
         PersonalAssignment assignment = personalAssignmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("과제가 존재하지 않습니다."));

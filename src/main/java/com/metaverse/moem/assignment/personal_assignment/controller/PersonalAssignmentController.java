@@ -16,9 +16,14 @@ public class PersonalAssignmentController {
     private final PersonalAssignmentService personalAssignmentService;
 
     // 생성
-    @PostMapping
-    public PersonalAssignmentDto.Res create(@RequestBody @Valid PersonalAssignmentDto.CreateReq req) {
-        return personalAssignmentService.create(req);
+    @PostMapping("/from-team")
+    public PersonalAssignmentDto.Res create(@RequestBody @Valid PersonalAssignmentDto.CreateFromTeamReq req) {
+        return personalAssignmentService.createFromTeam(req);
+    }
+
+    @PostMapping("/own")
+    public PersonalAssignmentDto.Res create(@RequestBody @Valid PersonalAssignmentDto.CreateOwnReq req) {
+        return personalAssignmentService.createOwn(req);
     }
 
     // 사용자 기반 전체 조회

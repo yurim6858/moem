@@ -17,37 +17,35 @@ public class PersonalAssignmentService {
     private final PersonalAssignmentRepository personalAssignmentRepository;
     private final TeamAssignmentRepository teamAssignmentRepository;
 
-    // 개인 과제 생성
-    public PersonalAssignmentDto.Res create(PersonalAssignmentDto.CreateReq req) {
-        PersonalAssignment assignment;
+    public PersonalAssignmentDto.Res createFromTeam(PersonalAssignmentDto.CreateFromTeamReq req) {
+        TeamAssignment teamAssignment = teamAssignmentRepository.findById(req.teamAssignmentId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 과제입니다."));
 
-        if (req.teamAssignmentId() != null) {
-            // team_assignment 기반
-            TeamAssignment teamAssignment = teamAssignmentRepository.findById(req.teamAssignmentId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 과제입니다."));
-
-            assignment = PersonalAssignment.builder()
-                    .teamAssignment(teamAssignment)
-                    .userId(req.userId())
-                    .title(teamAssignment.getTitle())
-                    .description((teamAssignment.getDescription()))
-                    .dueAt(teamAssignment.getDueAt())
-                    .userCreated(false)
-                    .build();
-
-        } else {
-            // user created
-            assignment = PersonalAssignment.builder()
-                    .userId(req.userId())
-                    .title(req.title())
-                    .description(req.description())
-                    .dueAt(req.dueAt())
-                    .userCreated(true)
-                    .build();
-        }
+        PersonalAssignment assignment = PersonalAssignment.builder()
+                .teamAssignment(teamAssignment)
+                .userId(req.userId())
+                .title(teamAssignment.getTitle())
+                .description(teamAssignment.getDescription())
+                .dueAt(teamAssignment.getDueAt())
+                .userCreated(false)
+                .build();
 
         return toRes(personalAssignmentRepository.save(assignment));
     }
+
+    public PersonalAssignmentDto.Res createOwn(PersonalAssignmentDto.CreateOwnReq req) {
+        PersonalAssignment assignment = PersonalAssignment.builder()
+                .userId(req.userId())
+                .title(req.title())
+                .description(req.description())
+                .dueAt(req.dueAt())
+                .userCreated(true)
+                .build();
+
+        return toRes(personalAssignmentRepository.save(assignment));
+    }
+
+
 
     // 전체 조회 (사용자 기반)
     public List<PersonalAssignmentDto.Res> getByUser(Long userId) {

@@ -13,7 +13,7 @@ public class PersonalAssignmentDto {
             @NotNull Long userId,
             @NotBlank String title,
             String description,
-            @NotBlank LocalDateTime dueAt
+            @NotNull LocalDateTime dueAt
     ) {}
 
     // 사용자가 직접 추가한 과제 수정

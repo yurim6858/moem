@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/assignments")
+@RequestMapping("/api/team-assignments")
 @RequiredArgsConstructor
 public class TeamAssignmentController {
 
@@ -36,9 +36,9 @@ public class TeamAssignmentController {
 
     // 수정
     @PutMapping("/{teamAssignmentId}")
-    public TeamAssignmentDto.Res update(@PathVariable Long projectId,
+    public TeamAssignmentDto.Res update(@PathVariable Long teamAssignmentId,
                                         @RequestBody @Valid TeamAssignmentDto.UpdateReq req) {
-        return teamAssignmentService.update(projectId, req);
+        return teamAssignmentService.update(teamAssignmentId, req);
     }
 
     // 삭제

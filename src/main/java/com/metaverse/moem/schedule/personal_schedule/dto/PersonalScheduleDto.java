@@ -8,7 +8,8 @@ public class PersonalScheduleDto {
         신규,
         여유,
         마감임박,
-        마감지남
+        마감지남,
+        알수없음
     }
 
     public record Res(

@@ -21,6 +21,9 @@ public class Assignment {
     private Long projectId;
 
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
     private String title;
 
     private String description;

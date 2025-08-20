@@ -5,9 +5,7 @@ import com.metaverse.moem.assignment.team_assignment.dto.TeamAssignmentDto;
 import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRepository;
 import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.repository.ProjectRepository;
-import com.metaverse.moem.team.domain.Team;
 import lombok.RequiredArgsConstructor;
-import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,14 +57,14 @@ public class TeamAssignmentService {
         teamAssignmentRepository.deleteById(teamAssignmentId);
     }
 
-    private TeamAssignmentDto.Res toRes(TeamAssignment a) {
+    private TeamAssignmentDto.Res toRes(TeamAssignment teamAssignment) {
         return new TeamAssignmentDto.Res(
-                a.getId(),
-                a.getProject().getId(),
-                a.getUserId(),
-                a.getTitle(),
-                a.getDescription(),
-                a.getDueAt()
+                teamAssignment.getId(),
+                teamAssignment.getProject().getId(),
+                teamAssignment.getUserId(),
+                teamAssignment.getTitle(),
+                teamAssignment.getDescription(),
+                teamAssignment.getDueAt()
         );
     }
 }

@@ -81,15 +81,15 @@ public class PersonalAssignmentService {
         personalAssignmentRepository.delete(assignment);
     }
 
-    private PersonalAssignmentDto.Res toRes(PersonalAssignment a) {
+    private PersonalAssignmentDto.Res toRes(PersonalAssignment personalAssignment) {
         return new PersonalAssignmentDto.Res(
-                a.getId(),
-                a.getTeamAssignment() != null ? a.getTeamAssignment().getId() : null,
-                a.getUserId(),
-                a.getTitle(),
-                a.getDescription(),
-                a.getDueAt(),
-                a.isUserCreated()
+                personalAssignment.getId(),
+                personalAssignment.getTeamAssignment() != null ? personalAssignment.getTeamAssignment().getId() : null,
+                personalAssignment.getUserId(),
+                personalAssignment.getTitle(),
+                personalAssignment.getDescription(),
+                personalAssignment.getDueAt(),
+                personalAssignment.isUserCreated()
         );
     }
 

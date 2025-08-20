@@ -34,7 +34,7 @@ public class ProjectService {
     // 단일 조회
     public Optional<ProjectDto.Res> get(Long id) {
         return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
+                .filter(project -> !project.isDeleted())
                 .map(this::toRes);
     }
 
@@ -50,7 +50,7 @@ public class ProjectService {
     // 수정
     public Optional<ProjectDto.Res> update(Long id,ProjectDto.UpdateReq req) {
         return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
+                .filter(project -> !project.isDeleted())
                 .map(project -> {
                     project.setName( req.name());
                     project.setUpdatedAt(LocalDateTime.now());
@@ -61,7 +61,7 @@ public class ProjectService {
     // 삭제
     public boolean delete(Long id) {
         return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
+                .filter(project -> !project.isDeleted())
                 .map(project -> {
                     project.setDeleted(true);
                     project.setUpdatedAt(LocalDateTime.now());
@@ -71,12 +71,12 @@ public class ProjectService {
                 .orElse(false);
     }
 
-    private ProjectDto.Res toRes(Project p) {
+    private ProjectDto.Res toRes(Project project) {
         return new ProjectDto.Res(
-                p.getId(),
-                p.getName(),
-                p.getType(),
-                p.getOwnerId()
+                project.getId(),
+                project.getName(),
+                project.getType(),
+                project.getOwnerId()
         );
     }
 

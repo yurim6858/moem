@@ -15,6 +15,7 @@ public class TeamScheduleDto {
         private String description;
         private LocalDateTime dueAt;
         private Long assignedUserId;
+        private LocalDateTime createdAt;
         private AssignmentStatus status;
     }
 

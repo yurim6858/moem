@@ -1,5 +1,6 @@
 package com.metaverse.moem.team.domain;
 
+import com.metaverse.moem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "user")
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     private Long id;
 

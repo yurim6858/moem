@@ -23,13 +23,13 @@ public class ProjectService {
                 .name(req.name())
                 .type(req.type())
                 .ownerId(req.ownerId())
-                .createdAt(java.time.LocalDateTime.now())
                 .isDeleted(false)
                 .build();
 
         Project saved = projectRepository.save(project);
         return toRes(saved);
     }
+
 
     // 단일 조회
     public Optional<ProjectDto.Res> get(Long id) {
@@ -48,13 +48,12 @@ public class ProjectService {
 
 
     // 수정
-    public Optional<ProjectDto.Res> update(Long id,ProjectDto.UpdateReq req) {
+    public Optional<ProjectDto.Res> update(Long id, ProjectDto.UpdateReq req) {
         return projectRepository.findById(id)
                 .filter(project -> !project.isDeleted())
                 .map(project -> {
-                    project.setName( req.name());
-                    project.setUpdatedAt(LocalDateTime.now());
-                    return toRes(projectRepository.save(project));
+                    project.setName(req.name());
+                    return toRes(projectRepository.save(project)); // updatedAt 자동 처리
                 });
     }
 
@@ -63,8 +62,7 @@ public class ProjectService {
         return projectRepository.findById(id)
                 .filter(project -> !project.isDeleted())
                 .map(project -> {
-                    project.setDeleted(true);
-                    project.setUpdatedAt(LocalDateTime.now());
+                    project.setDeleted(true); // updatedAt 자동 처리
                     projectRepository.save(project);
                     return true;
                 })

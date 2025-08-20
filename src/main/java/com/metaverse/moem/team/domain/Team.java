@@ -1,9 +1,9 @@
 package com.metaverse.moem.team.domain;
 
 
+import com.metaverse.moem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 
 @Getter
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder // 빌더 패턴 제공
 @Entity
 @Table(name = "teams") // DB Table 및 매핑, 테이블 이름 "teams"
-public class Team {
+public class Team extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     // PK, Auto_Increment
@@ -26,18 +26,5 @@ public class Team {
     @Column(length = 255)
     // 간략한 팀설명
     private String description;
-
-    @Column(nullable = false, updatable = false)
-    // 팀 생성시점 기록
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist // INSERT 되기 전 자동 실행 → 생성일/수정일 초기화
-    void onCreate(){ createdAt = LocalDateTime.now(); updatedAt = createdAt; }
-
-    @PreUpdate  // UPDATE 되기 전 자동 실행 → 수정일 갱신
-    void onUpdate(){ updatedAt = LocalDateTime.now(); }
 
 }

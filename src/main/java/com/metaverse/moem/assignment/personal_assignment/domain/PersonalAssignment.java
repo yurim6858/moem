@@ -1,6 +1,7 @@
 package com.metaverse.moem.assignment.personal_assignment.domain;
 
 import com.metaverse.moem.assignment.team_assignment.domain.TeamAssignment;
+import com.metaverse.moem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class PersonalAssignment {
+public class PersonalAssignment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,11 +37,6 @@ public class PersonalAssignment {
 
     @Column(nullable = false)
     private LocalDateTime dueAt;
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
 
     // 직접 생성한 과제
     @Column(nullable = false)

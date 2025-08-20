@@ -1,10 +1,9 @@
 package com.metaverse.moem.project.domain;
 
+import com.metaverse.moem.common.BaseTimeEntity;
 import com.metaverse.moem.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Project {
+public class Project extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +31,6 @@ public class Project {
 
     @Column(nullable = false)
     private Long ownerId; // team or user ID
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     private boolean isDeleted;
 

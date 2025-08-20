@@ -23,7 +23,7 @@ public class TeamMembersService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
 
-    // 팀원 생성
+
     public TeamMembersDto.Res create(Long teamId, TeamMembersDto.CreateReq req) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀이 존재하지 않습니다."));
@@ -31,13 +31,8 @@ public class TeamMembersService {
         User user = userRepository.findById(req.userId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
-        TeamMembers member = TeamMembers.builder()
-                .team(team)
-                .userId(req.userId())
-                .role(req.role())
-                .status("Active")
-                .joinAt(LocalDateTime.now())
-                .build();
+        TeamMembers member = TeamMembers.builder().team(team).userId(req.userId())
+                .role(req.role()).status("Active").joinAt(LocalDateTime.now()).build();
 
         TeamMembers saved = teamMembersRepository.save(member);
 
@@ -47,11 +42,10 @@ public class TeamMembersService {
                 saved.getRole(),
                 saved.getTeam().getId(),
                 saved.getJoinAt().toString(),
-                saved.getJoinAt().toString()
-        );
+                saved.getJoinAt().toString());
     }
 
-    // 팀원 수정
+
     public TeamMembersDto.Res update(Long memberId, TeamMembersDto.UpdateReq req) {
         TeamMembers member = teamMembersRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀원이 존재하지 않습니다."));
@@ -74,11 +68,10 @@ public class TeamMembersService {
                 member.getRole(),
                 member.getTeam().getId(),
                 member.getJoinAt().toString(),
-                LocalDateTime.now().toString()
-        );
+                LocalDateTime.now().toString());
     }
 
-    // 팀원 삭제
+
     public void delete(TeamMembersDto.DeleteReq req) {
         TeamMembers member = teamMembersRepository.findById(req.id())
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀원이 존재하지 않습니다."));
@@ -86,25 +79,22 @@ public class TeamMembersService {
         teamMembersRepository.delete(member);
     }
 
-    // 팀원 조회
+
     public List<TeamMembersDto.Res> getMembersByTeamId(Long teamId) {
 
         List<TeamMembers> members = teamMembersRepository.findByTeamId(teamId);
 
-        return members.stream()
-                .map(member -> {
-                    User user = userRepository.findById(member.getUserId())
-                            .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        return members.stream().map(member -> {
+            User user = userRepository.findById(member.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
-                    return new TeamMembersDto.Res(
-                            member.getId(),
-                            user.getName(),
-                            member.getRole(),
-                            member.getTeam().getId(),
-                            member.getJoinAt().toString(),
-                            LocalDateTime.now().toString()
-                    );
-                })
-                .toList();
+            return new TeamMembersDto.Res(
+                    member.getId(),
+                    user.getName(),
+                    member.getRole(),
+                    member.getTeam().getId(),
+                    member.getJoinAt().toString(),
+                    LocalDateTime.now().toString());
+        }).toList();
     }
 }

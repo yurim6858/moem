@@ -7,13 +7,11 @@ import java.time.LocalDateTime;
 
 public class PersonalAssignmentDto {
 
-    // 팀 기반 생성
     public record CreateFromTeamReq(
             @NotNull Long userId,
             @NotNull Long teamAssignmentId
     ) {}
 
-    // 사용자 직접 생성
     public record CreateOwnReq(
             @NotNull Long userId,
             @NotBlank String title,
@@ -22,7 +20,6 @@ public class PersonalAssignmentDto {
     ) {}
 
 
-    // 사용자가 직접 추가한 과제 수정
     public record UpdateReq(
             @NotBlank String title,
             String description,

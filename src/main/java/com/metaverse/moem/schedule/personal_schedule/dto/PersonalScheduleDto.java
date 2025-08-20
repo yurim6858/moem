@@ -19,5 +19,6 @@ public class PersonalScheduleDto {
             LocalDateTime dueAt,
             boolean userCreated,
             AssignmentStatus status
-    ) {}
+    ) {
+    }
 }

@@ -28,7 +28,7 @@ public class TeamScheduleService {
                         teamAssignment.getDueAt(),
                         teamAssignment.getUserId(),
                         teamAssignment.getCreatedAt(),
-                        calculateStatus(teamAssignment.getDueAt(),teamAssignment.getCreatedAt(),now)
+                        calculateStatus(teamAssignment.getDueAt(), teamAssignment.getCreatedAt(), now)
                 ))
                 .toList();
     }
@@ -52,7 +52,6 @@ public class TeamScheduleService {
 
         return TeamScheduleDto.AssignmentStatus.여유;
     }
-
 
 
 }

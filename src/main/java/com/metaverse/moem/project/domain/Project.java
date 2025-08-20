@@ -18,11 +18,11 @@ public class Project extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name; // project name
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectType type; // Team or Personal
+    private ProjectType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
@@ -30,7 +30,7 @@ public class Project extends BaseTimeEntity {
 
 
     @Column(nullable = false)
-    private Long ownerId; // team or user ID
+    private Long ownerId;
 
     private boolean isDeleted;
 

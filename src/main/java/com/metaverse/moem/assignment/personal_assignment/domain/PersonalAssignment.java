@@ -22,7 +22,6 @@ public class PersonalAssignment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // team_assignment 기반으로 생성된 과제
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_assignment_id")
     private TeamAssignment teamAssignment;
@@ -38,7 +37,6 @@ public class PersonalAssignment extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime dueAt;
 
-    // 직접 생성한 과제
     @Column(nullable = false)
     private boolean userCreated;
 
@@ -47,5 +45,4 @@ public class PersonalAssignment extends BaseTimeEntity {
         this.description = description;
         this.dueAt = dueAt;
     }
-
 }

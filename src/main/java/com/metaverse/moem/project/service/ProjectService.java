@@ -7,7 +7,6 @@ import com.metaverse.moem.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +16,6 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
-    // 생성
     public ProjectDto.Res create(ProjectDto.CreateReq req) {
         Project project = Project.builder()
                 .name(req.name())
@@ -31,14 +29,12 @@ public class ProjectService {
     }
 
 
-    // 단일 조회
     public Optional<ProjectDto.Res> get(Long id) {
         return projectRepository.findById(id)
                 .filter(project -> !project.isDeleted())
                 .map(this::toRes);
     }
 
-    // 소유자별 조회
     public List<ProjectDto.Res> listByOwner(ProjectType type, Long ownerId) {
         return projectRepository.findByTypeAndOwnerIdAndIsDeletedFalse(type, ownerId)
                 .stream()
@@ -47,22 +43,20 @@ public class ProjectService {
     }
 
 
-    // 수정
     public Optional<ProjectDto.Res> update(Long id, ProjectDto.UpdateReq req) {
         return projectRepository.findById(id)
                 .filter(project -> !project.isDeleted())
                 .map(project -> {
                     project.setName(req.name());
-                    return toRes(projectRepository.save(project)); // updatedAt 자동 처리
+                    return toRes(projectRepository.save(project));
                 });
     }
 
-    // 삭제
     public boolean delete(Long id) {
         return projectRepository.findById(id)
                 .filter(project -> !project.isDeleted())
                 .map(project -> {
-                    project.setDeleted(true); // updatedAt 자동 처리
+                    project.setDeleted(true);
                     projectRepository.save(project);
                     return true;
                 })
@@ -77,6 +71,5 @@ public class ProjectService {
                 project.getOwnerId()
         );
     }
-
 
 }

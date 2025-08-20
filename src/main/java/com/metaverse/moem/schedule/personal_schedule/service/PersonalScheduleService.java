@@ -16,13 +16,12 @@ public class PersonalScheduleService {
     private final PersonalAssignmentRepository personalAssignmentRepository;
 
     public List<PersonalScheduleDto.Res> getSchedules(Long userId) {
-        LocalDateTime now =  LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         List<PersonalAssignment> assignments = personalAssignmentRepository.findAllByUserId(userId);
 
-        // auto-delete : userCreated == true && 마감 지남
         assignments.removeIf(personalAssignment -> {
-            if (personalAssignment.isUserCreated() && personalAssignment.getDueAt().isBefore(now)){
+            if (personalAssignment.isUserCreated() && personalAssignment.getDueAt().isBefore(now)) {
                 personalAssignmentRepository.delete(personalAssignment);
                 return true;
             }
@@ -36,7 +35,7 @@ public class PersonalScheduleService {
                         personalAssignment.getDescription(),
                         personalAssignment.getDueAt(),
                         personalAssignment.isUserCreated(),
-                        calculateStatus(personalAssignment.getDueAt(),personalAssignment.getCreatedAt(), now)
+                        calculateStatus(personalAssignment.getDueAt(), personalAssignment.getCreatedAt(), now)
                 ))
                 .toList();
     }

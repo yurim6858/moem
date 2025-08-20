@@ -18,18 +18,15 @@ public class TeamMembers extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // team FK 연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    // user FK 연관관계
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Column(length = 20, nullable = false)
     private String name;
-
 
     @Column(length = 20, nullable = false)
     private String role;

@@ -11,6 +11,7 @@ import lombok.*;
 @Builder
 @Table(name = "user")
 public class User extends BaseTimeEntity {
+
     @Id
     private Long id;
 

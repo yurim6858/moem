@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface TeamAssignmentRepository extends JpaRepository<TeamAssignment, Long> {
     List<TeamAssignment> findAllByProjectId(Long projectId);
-    List<TeamAssignment> findAllByTeamId(Long teamId);
+    List<TeamAssignment> findAllByProject_TeamId(Long teamId);
     List<TeamAssignment> findAllByProjectIdAndUserId(Long projectId, Long userId);
 }

@@ -18,7 +18,7 @@ public class TeamScheduleService {
     public List<TeamScheduleDto.Res> getSchedules(Long teamId) {
         LocalDateTime now = LocalDateTime.now();
 
-        List<TeamAssignment> assignments = teamAssignmentRepository.findAllByTeamId(teamId);
+        List<TeamAssignment> assignments = teamAssignmentRepository.findAllByProject_TeamId(teamId);
 
         return assignments.stream()
                 .map(a -> new TeamScheduleDto.Res(

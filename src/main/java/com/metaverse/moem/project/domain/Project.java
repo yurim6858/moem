@@ -1,5 +1,6 @@
 package com.metaverse.moem.project.domain;
 
+import com.metaverse.moem.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,11 @@ public class Project {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProjectType type; // Team or Personal
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
 
     @Column(nullable = false)
     private Long ownerId; // team or user ID

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TeamScheduleRepository extends JpaRepository<TeamAssignment, Long> {
 
-    List<TeamAssignment> findAllByTeamId(Long teamId);
+    List<TeamAssignment> findAllByProject_TeamId(Long teamId);
 }

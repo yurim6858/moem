@@ -19,7 +19,7 @@ public class TeamScheduleController {
     private final TeamScheduleService teamScheduleService;
 
     @GetMapping("/{teamId}")
-    public List<TeamScheduleDto.Res> getTeamSchedules(@PathVariable Long TeamId) {
-        return teamScheduleService.getSchedules(TeamId);
+    public List<TeamScheduleDto.Res> getTeamSchedules(@PathVariable Long teamId) {
+        return teamScheduleService.getSchedules(teamId);
     }
 }

@@ -9,8 +9,10 @@ public class ProjectDto {
     public record CreateReq(
             @NotBlank String name,
             @NotNull ProjectType type,
-            @NotNull Long ownerId
+            @NotNull Long ownerId,
+            @NotNull Long teamId // ← 추가
     ) {}
+
 
     public record UpdateReq(
             @NotBlank String name

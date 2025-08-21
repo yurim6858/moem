@@ -5,6 +5,7 @@ import com.metaverse.moem.project.dto.ProjectDto;
 import com.metaverse.moem.project.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProjectController.class);
 
     @PostMapping
     public ProjectDto.Res create(@RequestBody @Valid ProjectDto.CreateReq req) {

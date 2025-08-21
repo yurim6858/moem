@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 public class MatchingRequest {
     private String title;
-    private String desc;
+    private String description;
     private List<String> tags;
     private LocalDate deadline;
     private String username;

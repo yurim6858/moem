@@ -22,7 +22,7 @@ public class MatchingService {
     public MatchingResponse create(MatchingRequest req) {
         Matching m = new Matching();
         m.setTitle(safeTrim(req.getTitle()));
-        m.setDescription(safeTrim(req.getDesc()));
+        m.setDescription(safeTrim(req.getDescription()));
         m.setTags(req.getTags() == null ? List.of() : req.getTags());
         m.setDeadline(req.getDeadline().atStartOfDay());
         m.setUsername(safeTrim(req.getUsername()));

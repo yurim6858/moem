@@ -6,7 +6,7 @@ import java.util.List;
 public record MatchingResponse(
         Long id,
         String title,
-        String desc,
+        String description,
         List<String> tags,
         LocalDate deadline,
         String username

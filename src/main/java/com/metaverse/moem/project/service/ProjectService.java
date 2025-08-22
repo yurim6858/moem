@@ -4,9 +4,7 @@ import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.dto.ProjectDto;
 import com.metaverse.moem.project.repository.ProjectRepository;
 import com.metaverse.moem.team.domain.Team;
-import com.metaverse.moem.team.domain.User;
 import com.metaverse.moem.team.repository.TeamRepository;
-import com.metaverse.moem.team.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,30 +17,25 @@ import java.util.Optional;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
     private final TeamRepository teamRepository;
 
     @Transactional
     public ProjectDto.Res create(ProjectDto.CreateReq req) {
-        User owner = userRepository.findById(req.ownerId())
-                .orElseThrow(() -> new IllegalArgumentException("팀장을 찾을 수 없습니다." + req.ownerId()));
-
         Project project = new Project();
-                project.setName(req.name());
-                project.setDescription(req.description());
-                project.setType(req.type());
-                project.setRecruitTotal(req.recruitTotal());
-                project.setRecruitCurrent(1);
-                project.setRecruitStartDate(req.recruitStartDate());
-                project.setRecruitEndDate(req.recruitEndDate());
-                project.setProjectStartDate(req.projectStartDate());
-                project.setProjectEndDate(req.projectEndDate());
+        project.setName(req.name());
+        project.setDescription(req.description());
+        project.setType(req.type());
+        project.setRecruitTotal(req.recruitTotal());
+        project.setRecruitCurrent(0);
+        project.setRecruitStartDate(req.recruitStartDate());
+        project.setRecruitEndDate(req.recruitEndDate());
+        project.setProjectStartDate(req.projectStartDate());
+        project.setProjectEndDate(req.projectEndDate());
 
         projectRepository.save(project);
 
-        Team team = new Team();
-        team.setProject(project);
-        team.setOwner(owner);
+
+        Team team = Team.create(project, req.teamName(), null);
         teamRepository.save(team);
 
         project.setTeam(team);
@@ -86,5 +79,4 @@ public class ProjectService {
                 })
                 .orElse(false);
     }
-
 }

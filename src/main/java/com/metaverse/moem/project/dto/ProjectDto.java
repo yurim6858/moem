@@ -2,7 +2,6 @@ package com.metaverse.moem.project.dto;
 
 import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.domain.ProjectType;
-import jakarta.persistence.Basic;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -23,7 +22,7 @@ public class ProjectDto {
             LocalDate recruitEndDate,
             LocalDate projectStartDate,
             LocalDate projectEndDate,
-            @NotNull Long ownerId
+            String teamName
     ) {}
 
     @Builder
@@ -60,16 +59,16 @@ public class ProjectDto {
                     .description(project.getDescription())
                     .type(project.getType())
                     .recruitTotal(project.getRecruitTotal())
-                    .recruitStartDate(project.getRecruitStartDate())
                     .recruitCurrent(project.getRecruitCurrent())
+                    .recruitStartDate(project.getRecruitStartDate())
                     .recruitEndDate(project.getRecruitEndDate())
                     .projectStartDate(project.getProjectStartDate())
                     .projectEndDate(project.getProjectEndDate())
                     .teamId(project.getTeam() != null ? project.getTeam().getId() : null)
-                    .ownerId(project.getTeam() != null ? project.getTeam().getOwner().getId() : null)
+                    .ownerId(null) //
                     .build();
-            }
         }
+    }
 
         public record SearchCondition(
                 ProjectType type,

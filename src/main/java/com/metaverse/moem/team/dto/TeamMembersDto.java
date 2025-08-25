@@ -1,31 +1,34 @@
 package com.metaverse.moem.team.dto;
 
-import jakarta.validation.constraints.NotNull;
+import com.metaverse.moem.team.domain.Role;
+import com.metaverse.moem.team.domain.TeamMembers;
+import lombok.Builder;
 
 public class TeamMembersDto {
 
-    public record CreateReq(
-            @NotNull Long teamId,
-            @NotNull Long userId,
-            String role) {
-    }
+    public record CreateReq(Long userId) {}
 
-    public record UpdateReq(
-            String name,
-            String role) {
-    }
+    public record UpdateReq(Role role) {}
 
-    public record DeleteReq(
-            @NotNull Long id) {
-    }
-
+    @Builder
     public record Res(
             Long id,
-            String name,
-            String role,
             Long teamId,
-            String CreatedAt,
-            String UpdatedAt) {
+            Long userId,
+            Role role,
+            String createdAt,
+            String updatedAt
+    ) {
+        public static Res from(TeamMembers members) {
+            return Res.builder()
+                    .id(members.getId())
+                    .teamId(members.getTeam().getId())
+                    .userId(members.getUserId())
+                    .role(members.getRole())
+                    .createdAt(members.getCreatedAt() == null ? null : members.getCreatedAt().toString())
+                    .updatedAt(members.getUpdatedAt() == null ? null : members.getUpdatedAt().toString())
+                    .build();
+        }
     }
 
 }

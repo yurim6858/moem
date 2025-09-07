@@ -47,6 +47,7 @@ public class Team extends BaseTimeEntity {
     public static Team create(Project project, String name, Integer maxMembers) {
         Team team = new Team();
         team.project = project;
+        team.maxMembers = maxMembers;
         team.name = (name == null || name.isBlank())
                 ? project.getName()
                 : name;

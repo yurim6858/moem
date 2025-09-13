@@ -11,5 +11,5 @@ import java.util.List;
 @Builder
 public class RecommendationResponseDto {
     private UserDto baseUser;
-    private List<RecommendationResponseDto> recommendations;
+    private List<RecommendationRequestDto> recommendations;
 }

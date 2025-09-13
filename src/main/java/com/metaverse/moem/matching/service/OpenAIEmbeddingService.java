@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @Profile("real")
 @RequiredArgsConstructor
-public class OpenAIEmbeddingService {
+public class OpenAIEmbeddingService implements  EmbeddingPort {
 
     private final OpenAIClient openAI;
 

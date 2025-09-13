@@ -16,8 +16,9 @@ public class AIMatchController {
     private final AIMatchService aiMatchService;
 
     @GetMapping("/recommend")
-    public RecommendationResponseDto recommend(@RequestParam Long UserId,
-                                               @RequestParam(defaultValue = "5") int limit) {
-        return aiMatchService.recommend(UserId, Math.max(1, Math.min(limit, 20)));
+    public RecommendationResponseDto recommend(
+            @RequestParam Long baseUserId,
+            @RequestParam(name = "limit", required = false, defaultValue = "5") Integer limit) {
+        return aiMatchService.recommend(baseUserId, Math.max(1, Math.min(limit, 20)));
     }
 }

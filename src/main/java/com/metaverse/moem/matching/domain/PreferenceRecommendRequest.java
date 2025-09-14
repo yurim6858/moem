@@ -11,8 +11,7 @@ public record PreferenceRecommendRequest(
         List<String> interests,
         List<TimeSlotDto> availability,
         MeetingPreference meetingPreference,
-        String regionCode,
         Integer limit,
 
-        Double skillWeight, Double interestWeight, Double timeWeight, Double meetingWeight, Double regionWeight
+        Double skillWeight, Double interestWeight, Double timeWeight, Double meetingWeight
 ) {}

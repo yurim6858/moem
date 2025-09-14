@@ -24,9 +24,6 @@ public class AIMatchService {
     private static final double DEFAULT_WEIGHT_INTEREST = 0.25;
     private static final double DEFAULT_WEIGHT_TIME     = 0.20;
     private static final double DEFAULT_WEIGHT_MEETING  = 0.10;
-    private static final double DEFAULT_WEIGHT_GEO      = 0.05;
-
-    private static final double DISTANCE_MAX_KM = 30.0;
 
     private final UserRepository userRepository;
 
@@ -76,7 +73,6 @@ public class AIMatchService {
         double interestWeight = Optional.ofNullable(preferenceRecommendRequest.interestWeight()).orElse(DEFAULT_WEIGHT_INTEREST);
         double timeWeight = Optional.ofNullable(preferenceRecommendRequest.timeWeight()).orElse(DEFAULT_WEIGHT_TIME);
         double meetingWeight = Optional.ofNullable(preferenceRecommendRequest.meetingWeight()).orElse(DEFAULT_WEIGHT_MEETING);
-        double regionWeight = Optional.ofNullable(preferenceRecommendRequest.regionWeight()).orElse(DEFAULT_WEIGHT_GEO);
 
         List<RecommendationRequestDto> recommendationRequestDto = userRepository.findAll().stream()
                 .map(user -> {
@@ -84,9 +80,8 @@ public class AIMatchService {
                     double selectedInterest = jaccard(selectedInterests, toLowerSet(user.getInterests()));
                     double selectedTime = scoreTimeAgainstWanted(user, preferenceRecommendRequest.availability());
                     double selectedMeeting = scoreMeetingAgainstPreferred(user, preferenceRecommendRequest.meetingPreference());
-                    double selectedRegion = scoreRegionAgainstSelected(user, preferenceRecommendRequest.meetingPreference(), preferenceRecommendRequest.regionCode());
 
-                    double score = skillWeight * selectedSkill + interestWeight *  selectedInterest + timeWeight * selectedTime + meetingWeight * selectedMeeting +  regionWeight * selectedRegion;
+                    double score = skillWeight * selectedSkill + interestWeight *  selectedInterest + timeWeight * selectedTime + meetingWeight * selectedMeeting;
 
                     return RecommendationRequestDto.builder()
                             .userId(user.getId())
@@ -148,31 +143,6 @@ public class AIMatchService {
         if (meetingPreference == candidate) return 1.0;
         if (meetingPreference == MeetingPreference.HYBRID || candidate == MeetingPreference.HYBRID) return 0.5;
         return 0.0;
-    }
-
-    private String getUserRegionCode(User user) {
-        return null;
-    }
-
-    private double scoreRegionAgainstSelected(User user, MeetingPreference meetingPreference, String regionCode) {
-        if (meetingPreference != MeetingPreference.OFFLINE) return 0.0;
-        if (regionCode == null || regionCode.isBlank()) return 0.0;
-
-        String candidateRegion = getUserRegionCode(user);
-        if (candidateRegion != null && regionCode.equalsIgnoreCase(candidateRegion)) return 1.0;
-        return 0.0;
-    }
-
-    private static double haversine(double latitudeHome, double longitudeHome, double latitudeSelected, double longitudeSelected) {
-        double EarthRadius = 6371.0;
-        double distanceLatitude =  Math.toRadians(latitudeSelected - latitudeHome);
-        double distanceLongitude = Math.toRadians(longitudeSelected - longitudeHome);
-        double haversine = Math.sin(distanceLatitude/2) * Math.sin(distanceLatitude/2) +
-                        Math.cos(Math.toRadians(latitudeHome)) * Math.cos(Math.toRadians(latitudeSelected)) *
-                        Math.sin(distanceLongitude/2) * Math.sin(distanceLongitude/2);
-
-        double centralAngleRadian = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1.0 - haversine));
-        return EarthRadius * centralAngleRadian;
     }
 
     private static double clamp01(double value) {

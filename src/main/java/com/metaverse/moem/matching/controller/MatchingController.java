@@ -39,4 +39,15 @@ public class MatchingController {
     public MatchingResponse get(@PathVariable Long id) {
         return matchingService.get(id);
     }
+
+    @PutMapping("/{id}")
+    public MatchingResponse update(@PathVariable Long id, @RequestBody MatchingRequest req) {
+        return matchingService.update(id, req);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        matchingService.delete(id);
+        return ResponseEntity.noContent().build(); // 204
+    }
 }

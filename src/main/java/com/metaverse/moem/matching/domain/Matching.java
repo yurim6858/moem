@@ -19,6 +19,9 @@ public class Matching {
     private String title;
 
     @Column
+    private String intro;
+
+    @Column
     private String description;
 
     @ElementCollection
@@ -30,4 +33,32 @@ public class Matching {
 
     @Column
     private String username;
+
+    @Column
+    private String workStyle;
+
+    @Column
+    private String contactType;
+
+    @Column
+    private String contactValue;
+
+    @Column
+    private String collaborationPeriod;
+
+    @ElementCollection
+    @CollectionTable(name = "matching_positions", joinColumns = @JoinColumn(name = "matching_id"))
+    @AttributeOverrides({
+        @AttributeOverride(name = "role", column = @Column(name = "role")),
+        @AttributeOverride(name = "headcount", column = @Column(name = "headcount"))
+    })
+    private List<Position> positions = new ArrayList<>();
+
+    @Embeddable
+    @Getter
+    @Setter
+    public static class Position {
+        private String role;
+        private Integer headcount;
+    }
 }

@@ -10,10 +10,23 @@ import java.util.List;
 @Setter
 public class MatchingRequest {
     private String title;
+    private String intro;
     private String description;
     private List<String> tags;
     private LocalDate deadline;
     private String username;
+    private String workStyle;
+    private String contactType;
+    private String contactValue;
+    private String collaborationPeriod;
+    private List<PositionRequest> positions;
+
+    @Getter
+    @Setter
+    public static class PositionRequest {
+        private String role;
+        private Integer headcount;
+    }
 
     public MatchingRequest() {}
 }

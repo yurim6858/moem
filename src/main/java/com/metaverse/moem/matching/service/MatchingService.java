@@ -20,13 +20,33 @@ public class MatchingService {
     }
 
     public MatchingResponse create(MatchingRequest req) {
-        Matching m = new Matching();
-        m.setTitle(safeTrim(req.getTitle()));
-        m.setDescription(safeTrim(req.getDescription()));
-        m.setTags(req.getTags() == null ? List.of() : req.getTags());
-        m.setDeadline(req.getDeadline().atStartOfDay());
-        m.setUsername(safeTrim(req.getUsername()));
-        Matching saved = repo.save(m);
+        Matching matching = new Matching();
+        matching.setTitle(safeTrim(req.getTitle()));
+        matching.setIntro(safeTrim(req.getIntro()));
+        matching.setDescription(safeTrim(req.getDescription()));
+        matching.setTags(req.getTags() == null ? List.of() : req.getTags());
+        matching.setDeadline(req.getDeadline().atStartOfDay());
+        matching.setUsername(safeTrim(req.getUsername()));
+        matching.setWorkStyle(safeTrim(req.getWorkStyle()));
+        matching.setContactType(safeTrim(req.getContactType()));
+        matching.setContactValue(safeTrim(req.getContactValue()));
+        matching.setCollaborationPeriod(safeTrim(req.getCollaborationPeriod()));
+        
+        // 포지션 변환
+        if (req.getPositions() != null) {
+            List<Matching.Position> positions = req.getPositions().stream()
+                    .map(pos -> {
+                        Matching.Position position = new Matching.Position();
+                        position.setRole(safeTrim(pos.getRole()));
+                        position.setHeadcount(pos.getHeadcount());
+                        return position;
+                    })
+                    .filter(pos -> pos.getRole() != null && !pos.getRole().isEmpty())
+                    .toList();
+            matching.setPositions(positions);
+        }
+        
+        Matching saved = repo.save(matching);
         return toResp(saved);
     }
 
@@ -37,23 +57,76 @@ public class MatchingService {
 
     @Transactional(readOnly = true)
     public MatchingResponse get(Long id) {
-        Matching m = repo.findById(id)
+        Matching matching = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND"));
-        return toResp(m);
+        return toResp(matching);
     }
 
-    private MatchingResponse toResp(Matching m) {
+    @Transactional
+    public MatchingResponse update(Long id, MatchingRequest req) {
+        Matching matching = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND"));
+        
+        matching.setTitle(safeTrim(req.getTitle()));
+        matching.setIntro(safeTrim(req.getIntro()));
+        matching.setDescription(safeTrim(req.getDescription()));
+        matching.setTags(req.getTags() == null ? List.of() : req.getTags());
+        matching.setDeadline(req.getDeadline().atStartOfDay());
+        matching.setUsername(safeTrim(req.getUsername()));
+        matching.setWorkStyle(safeTrim(req.getWorkStyle()));
+        matching.setContactType(safeTrim(req.getContactType()));
+        matching.setContactValue(safeTrim(req.getContactValue()));
+        matching.setCollaborationPeriod(safeTrim(req.getCollaborationPeriod()));
+        
+        // 포지션 변환
+        if (req.getPositions() != null) {
+            List<Matching.Position> positions = req.getPositions().stream()
+                    .map(pos -> {
+                        Matching.Position position = new Matching.Position();
+                        position.setRole(safeTrim(pos.getRole()));
+                        position.setHeadcount(pos.getHeadcount());
+                        return position;
+                    })
+                    .filter(pos -> pos.getRole() != null && !pos.getRole().isEmpty())
+                    .toList();
+            matching.setPositions(positions);
+        }
+        
+        Matching saved = repo.save(matching);
+        return toResp(saved);
+    }
+
+    private MatchingResponse toResp(Matching matching) {
+        List<MatchingResponse.PositionResponse> positions = matching.getPositions() == null ? 
+                List.of() : 
+                matching.getPositions().stream()
+                        .map(pos -> new MatchingResponse.PositionResponse(pos.getRole(), pos.getHeadcount()))
+                        .toList();
+        
         return new MatchingResponse(
-                m.getId(),
-                m.getTitle(),
-                m.getDescription(),
-                m.getTags(),
-                m.getDeadline().toLocalDate(),
-                m.getUsername()
+                matching.getId(),
+                matching.getTitle(),
+                matching.getIntro(),
+                matching.getDescription(),
+                matching.getTags(),
+                matching.getDeadline().toLocalDate(),
+                matching.getUsername(),
+                matching.getWorkStyle(),
+                matching.getContactType(),
+                matching.getContactValue(),
+                matching.getCollaborationPeriod(),
+                positions
         );
     }
 
     private String safeTrim(String s) {
         return s == null ? null : s.trim();
+    }
+
+    public void delete(Long id) {
+        if (!repo.existsById(id)) {
+            throw new IllegalArgumentException("NOT_FOUND");
+        }
+        repo.deleteById(id);
     }
 }

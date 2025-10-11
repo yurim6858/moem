@@ -19,3 +19,4 @@ public enum UserRole implements GrantedAuthority {
         return this.authority;
     }
 }
+

@@ -46,15 +46,12 @@ public class AuthController {
         try {
             userService.registerUser(signUpRequestDto);
 
-            // **!!! DB 성공 후 문제가 발생하면 500으로 명확히 응답하도록 함 !!!**
+
             return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
 
         } catch (IllegalArgumentException e) {
-            // DTO 문제 외의 로직 오류 (예: 중복)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
-        } catch (RuntimeException e) { // 💡 RuntimeException 추가
-            // DB 성공 후 발생한 NullPointer, IndexOutOfBounds 등 런타임 예외를 잡음
+        } catch (RuntimeException e) {
             System.err.println("DB 성공 후 Runtime 예외 발생: " + e.getMessage());
             e.printStackTrace(); // 콘솔에 스택 트레이스 출력
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 가입 후처리 중 오류가 발생했습니다.");

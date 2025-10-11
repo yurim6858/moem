@@ -2,7 +2,7 @@ package com.metaverse.moem.matching.controller;
 
 import com.metaverse.moem.matching.dto.MatchingRequest;
 import com.metaverse.moem.matching.dto.MatchingResponse;
-import com.metaverse.moem.matching.service.MatchingService;
+import com.metaverse.moem.matching.service.ProjectPostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,44 +10,44 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/recruitments")
-public class MatchingController {
+@RequestMapping("/api/project-posts")
+public class ProjectPostController {
 
-    private final MatchingService matchingService;
+    private final ProjectPostService projectPostService;
 
-    public MatchingController(MatchingService matchingService) {
-        this.matchingService = matchingService;
+    public ProjectPostController(ProjectPostService projectPostService) {
+        this.projectPostService = projectPostService;
     }
 
     @PostMapping
     public ResponseEntity<MatchingResponse> create(@RequestBody MatchingRequest req) {
-        MatchingResponse res = matchingService.create(req);
+        MatchingResponse res = projectPostService.create(req);
 
         Long id = (res.id() != null) ? res.id() : null;
 
         return ResponseEntity
-                .created(URI.create("/api/recruitments/" + id))
+                .created(URI.create("/api/project-posts/" + id))
                 .body(res);
     }
 
     @GetMapping
     public List<MatchingResponse> list() {
-        return matchingService.list();
+        return projectPostService.list();
     }
 
     @GetMapping("/{id}")
     public MatchingResponse get(@PathVariable Long id) {
-        return matchingService.get(id);
+        return projectPostService.get(id);
     }
 
     @PutMapping("/{id}")
     public MatchingResponse update(@PathVariable Long id, @RequestBody MatchingRequest req) {
-        return matchingService.update(id, req);
+        return projectPostService.update(id, req);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        matchingService.delete(id);
+        projectPostService.delete(id);
         return ResponseEntity.noContent().build(); // 204
     }
 }

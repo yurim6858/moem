@@ -14,7 +14,8 @@ public class MatchingRequest {
     private String description;
     private List<String> tags;
     private LocalDate deadline;
-    private String username;
+    private Long creatorId; // 작성자 ID
+    private String username; // 호환성을 위해 유지
     private String workStyle;
     private String contactType;
     private String contactValue;

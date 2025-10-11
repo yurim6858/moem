@@ -1,0 +1,10 @@
+{
+  "email": "debug@example.com",
+  "username": "debuguser",
+  "intro": "디버깅용 사용자입니다.",
+  "skills": ["Java", "Spring"],
+  "contactType": "email",
+  "contactValue": "debug@example.com",
+  "workStyle": "remote",
+  "collaborationPeriod": "1개월"
+}

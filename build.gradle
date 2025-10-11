@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'application'
 }
 
 group = 'com.metaverse'
@@ -45,4 +46,27 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// BootRun task configuration
+bootRun {
+    // Increase timeout for startup
+    systemProperty 'spring.jpa.hibernate.ddl-auto', 'create-drop'
+    systemProperty 'spring.jpa.show-sql', 'true'
+    
+    // JVM options for better performance
+    jvmArgs = [
+        '-Xmx1024m',
+        '-Xms512m',
+        '-XX:+UseG1GC',
+        '-Dspring.profiles.active=dev'
+    ]
+    
+    // Enable debug logging
+    args = ['--debug']
+}
+
+// Configure application startup
+application {
+    mainClass = 'com.metaverse.moem.MoemApplication'
 }

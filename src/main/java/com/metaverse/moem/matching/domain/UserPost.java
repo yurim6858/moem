@@ -1,7 +1,7 @@
 package com.metaverse.moem.matching.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.metaverse.moem.auth.domain.Auth;
+import com.metaverse.moem.auth.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ public class UserPost {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_id", nullable = false)
     @JsonIgnore
-    private Auth auth;
+    private User auth;
 
     @Column(length = 500)
     private String intro;

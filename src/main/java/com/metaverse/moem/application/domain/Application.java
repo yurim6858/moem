@@ -1,6 +1,6 @@
 package com.metaverse.moem.application.domain;
 
-import com.metaverse.moem.auth.domain.Auth;
+import com.metaverse.moem.auth.domain.User;
 import com.metaverse.moem.matching.domain.ProjectPost;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +26,7 @@ public class Application {
     // 🔥 지원자와 연관관계 설정 (Auth와 직접 연결)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
-    private Auth applicant;
+    private User applicant;
 
     @Column(length = 500)
     private String message;
@@ -70,11 +70,11 @@ public class Application {
     }
 
     // 🔥 비즈니스 로직 메서드
-    public boolean isFromSameUser(Auth user) {
+    public boolean isFromSameUser(User user) {
         return applicant != null && applicant.getId().equals(user.getId());
     }
 
-    public boolean canBeApprovedBy(Auth user) {
+    public boolean canBeApprovedBy(User user) {
         return project != null && project.getCreator() != null && project.getCreator().getId().equals(user.getId());
     }
 

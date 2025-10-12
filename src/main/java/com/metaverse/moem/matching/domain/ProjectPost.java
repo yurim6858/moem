@@ -1,6 +1,6 @@
 package com.metaverse.moem.matching.domain;
 
-import com.metaverse.moem.auth.domain.Auth;
+import com.metaverse.moem.auth.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +36,7 @@ public class ProjectPost {
     // 🔥 작성자와 연관관계 설정 (Auth 직접 참조)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
-    private Auth creator;
+    private User creator;
 
     @Column
     private String workStyle;

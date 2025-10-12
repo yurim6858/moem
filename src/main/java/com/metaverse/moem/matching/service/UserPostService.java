@@ -1,7 +1,7 @@
 package com.metaverse.moem.matching.service;
 
-import com.metaverse.moem.auth.domain.Auth;
-import com.metaverse.moem.auth.repository.AuthRepository;
+import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.auth.repository.UserRepository;
 import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.matching.dto.UserRequest;
 import com.metaverse.moem.matching.dto.UserResponse;
@@ -19,20 +19,16 @@ import java.util.stream.Collectors;
 public class UserPostService {
 
     private final UserPostRepository userPostRepository;
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public UserResponse createUserPost(UserRequest request) {
-        // 기존 Auth 조회 또는 생성
-        Auth auth = authRepository.findByEmail(request.getEmail())
+        // 기존 User 조회 또는 생성
+        User auth = userRepository.findByEmail(request.getEmail())
                 .orElseGet(() -> {
-                    // Auth가 없으면 새로 생성
-                    Auth newAuth = Auth.builder()
-                            .email(request.getEmail())
-                            .username(request.getUsername())
-                            .password("default_password") // 실제로는 암호화 필요
-                            .build();
-                    return authRepository.save(newAuth);
+                    // User가 없으면 새로 생성
+                    User newUser = new User(request.getUsername(), request.getUsername(), "default_password", request.getEmail(), null);
+                    return userRepository.save(newUser);
                 });
         
         // 이미 UserPost가 있는지 확인 (username 기준)
@@ -73,17 +69,17 @@ public class UserPostService {
                 .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다."));
 
         // 사용자명 중복 확인 (자신 제외)
-        Auth currentAuth = userPost.getAuth();
+        User currentAuth = userPost.getAuth();
         if (currentAuth != null && !currentAuth.getUsername().equals(request.getUsername()) && 
             userPostRepository.existsByAuth_Username(request.getUsername())) {
             throw new RuntimeException("이미 존재하는 사용자명입니다.");
         }
 
         // Auth 업데이트
-        Auth auth = userPost.getAuth();
+        User auth = userPost.getAuth();
         auth.setEmail(request.getEmail());
         auth.setUsername(request.getUsername());
-        authRepository.save(auth);
+        userRepository.save(auth);
 
         // UserPost 업데이트
         userPost.setIntro(request.getIntro());

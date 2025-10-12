@@ -1,0 +1,10 @@
+{
+  "email": "newuser@example.com",
+  "username": "newuser",
+  "intro": "New user profile for testing",
+  "skills": ["JavaScript", "React", "Node.js"],
+  "contactType": "Email",
+  "contactValue": "newuser@example.com",
+  "workStyle": "Remote",
+  "collaborationPeriod": "3 months"
+}

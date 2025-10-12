@@ -1,8 +1,8 @@
 package com.metaverse.moem.matching.service;
 
 import com.metaverse.moem.matching.domain.ProjectPost;
-import com.metaverse.moem.auth.domain.Auth;
-import com.metaverse.moem.auth.repository.AuthRepository;
+import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.auth.repository.UserRepository;
 import com.metaverse.moem.matching.dto.MatchingRequest;
 import com.metaverse.moem.matching.dto.MatchingResponse;
 import com.metaverse.moem.matching.repository.ProjectPostRepository;
@@ -16,16 +16,16 @@ import java.util.List;
 public class ProjectPostService {
 
     private final ProjectPostRepository projectPostRepository;
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
 
-    public ProjectPostService(ProjectPostRepository projectPostRepository, AuthRepository authRepository) {
+    public ProjectPostService(ProjectPostRepository projectPostRepository, UserRepository userRepository) {
         this.projectPostRepository = projectPostRepository;
-        this.authRepository = authRepository;
+        this.userRepository = userRepository;
     }
 
     public MatchingResponse create(MatchingRequest req) {
-        // 작성자 조회 (Auth 직접 조회)
-        Auth creator = authRepository.findById(req.getCreatorId())
+        // 작성자 조회 (User 직접 조회)
+        User creator = userRepository.findById(req.getCreatorId())
                     .orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
 
         ProjectPost projectPost = new ProjectPost();

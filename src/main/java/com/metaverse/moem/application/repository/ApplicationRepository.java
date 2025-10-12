@@ -1,7 +1,7 @@
 package com.metaverse.moem.application.repository;
 
 import com.metaverse.moem.application.domain.Application;
-import com.metaverse.moem.auth.domain.Auth;
+import com.metaverse.moem.auth.domain.User;
 import com.metaverse.moem.matching.domain.ProjectPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
     List<Application> findByProject(ProjectPost project);
-    List<Application> findByApplicant(Auth applicant);
-    Optional<Application> findByProjectAndApplicant(ProjectPost project, Auth applicant);
-    boolean existsByProjectAndApplicant(ProjectPost project, Auth applicant);
+    List<Application> findByApplicant(User applicant);
+    Optional<Application> findByProjectAndApplicant(ProjectPost project, User applicant);
+    boolean existsByProjectAndApplicant(ProjectPost project, User applicant);
     
     // 연관관계를 통한 조회 (중첩 속성 사용)
     List<Application> findByProject_Id(Long projectId);

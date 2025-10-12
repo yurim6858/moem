@@ -5,9 +5,7 @@ import com.metaverse.moem.assignment.team_assignment.dto.TeamAssignmentDto;
 import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRepository;
 import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.repository.ProjectRepository;
-import com.metaverse.moem.team.domain.Team;
 import lombok.RequiredArgsConstructor;
-import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

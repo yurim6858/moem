@@ -10,10 +10,24 @@ import java.util.List;
 @Setter
 public class MatchingRequest {
     private String title;
-    private String desc;
+    private String intro;
+    private String description;
     private List<String> tags;
     private LocalDate deadline;
-    private String username;
+    private Long creatorId; // 작성자 ID
+    private String username; // 호환성을 위해 유지
+    private String workStyle;
+    private String contactType;
+    private String contactValue;
+    private String collaborationPeriod;
+    private List<PositionRequest> positions;
+
+    @Getter
+    @Setter
+    public static class PositionRequest {
+        private String role;
+        private Integer headcount;
+    }
 
     public MatchingRequest() {}
 }

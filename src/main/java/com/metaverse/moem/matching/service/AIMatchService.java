@@ -1,5 +1,7 @@
 package com.metaverse.moem.matching.service;
 
+// ✨ 필요한 클래스들을 import 합니다.
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metaverse.moem.matching.domain.MeetingPreference;
 import com.metaverse.moem.matching.domain.PreferenceRecommendRequest;
 import com.metaverse.moem.matching.dto.RecommendationRequestDto;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,10 +29,44 @@ public class AIMatchService {
     private static final double DEFAULT_WEIGHT_MEETING  = 0.10;
 
     private final UserRepository userRepository;
+    private final GeminiService geminiService; // ✨ GeminiService를 주입받습니다.
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public RecommendationResponseDto recommendByNaturalLanguage(String query) throws IOException {
+        String prompt = String.format("""
+            사용자 문장을 분석해서 PreferenceRecommendRequest JSON 객체로 변환해줘.
+            - skills: 기술 스택 배열
+            - interests: 관심사 배열
+            - JSON 외에 다른 설명은 절대 추가하지마.
+            - 분석할 수 없는 필드는 null로 설정해.
+            
+            사용자 문장: "%s"
+            
+            JSON 형식:
+            {
+              "skills": ["..."],
+              "interests": ["..."],
+              "skillWeight": null,
+              "interestWeight": null,
+              "timeWeight": null,
+              "meetingWeight": null,
+              "availability": null,
+              "meetingPreference": null,
+              "limit": 5
+            }
+        """, query);
+
+        String jsonResponse = geminiService.getCompletion(prompt);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        PreferenceRecommendRequest request = objectMapper.readValue(jsonResponse, PreferenceRecommendRequest.class);
+
+        return recommendByPreference(request);
+    }
+
 
     public RecommendationResponseDto recommend(Long baseUserId, int limit) {
         User base = userRepository.findById(baseUserId)

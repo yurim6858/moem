@@ -27,6 +27,10 @@ public class AIMatchService {
 
     private final UserRepository userRepository;
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     public RecommendationResponseDto recommend(Long baseUserId, int limit) {
         User base = userRepository.findById(baseUserId)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + baseUserId));
@@ -60,7 +64,6 @@ public class AIMatchService {
                 .baseUser(baseDto)
                 .recommendations(recommendation)
                 .build();
-
     }
 
     public RecommendationResponseDto recommendByPreference(PreferenceRecommendRequest preferenceRecommendRequest) {
@@ -81,7 +84,7 @@ public class AIMatchService {
                     double selectedTime = scoreTimeAgainstWanted(user, preferenceRecommendRequest.availability());
                     double selectedMeeting = scoreMeetingAgainstPreferred(user, preferenceRecommendRequest.meetingPreference());
 
-                    double score = skillWeight * selectedSkill + interestWeight *  selectedInterest + timeWeight * selectedTime + meetingWeight * selectedMeeting;
+                    double score = skillWeight * selectedSkill + interestWeight * selectedInterest + timeWeight * selectedTime + meetingWeight * selectedMeeting;
 
                     return RecommendationRequestDto.builder()
                             .userId(user.getId())
@@ -119,7 +122,6 @@ public class AIMatchService {
     }
 
     private List<Slot> userSlotsByDay(User user, int dayOfWeek) {
-
         return List.of();
     }
 

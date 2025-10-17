@@ -2,13 +2,16 @@ package com.metaverse.moem.matching.controller;
 
 import com.metaverse.moem.matching.domain.PreferenceRecommendRequest;
 import com.metaverse.moem.matching.domain.User;
+import com.metaverse.moem.matching.dto.NaturalSearchRequestDto;
 import com.metaverse.moem.matching.dto.RecommendationResponseDto;
 import com.metaverse.moem.matching.service.AIMatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/match")
 @RequiredArgsConstructor
@@ -23,10 +26,14 @@ public class AIMatchController {
         return aiMatchService.recommend(baseUserId, Math.max(1, Math.min(limit, 20)));
     }
 
-    // ✨ 이 부분을 수정했습니다.
     @GetMapping("/users")
     public List<User> getAllUsers() {
         return aiMatchService.getAllUsers();
+    }
+
+    @PostMapping("/recommend/natural")
+    public RecommendationResponseDto recommendByNaturalLanguage(@RequestBody NaturalSearchRequestDto request) throws IOException {
+        return aiMatchService.recommendByNaturalLanguage(request.getQuery());
     }
 
     @PostMapping("/recommend/by-preference")

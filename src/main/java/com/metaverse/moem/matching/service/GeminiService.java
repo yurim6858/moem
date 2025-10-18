@@ -20,7 +20,7 @@ public class GeminiService {
 
     public String getCompletion(String prompt) throws IOException {
         try (VertexAI vertexAI = new VertexAI(projectId, "us-central1")) {
-            GenerativeModel model = new GenerativeModel("gemini-1.5-flash-001", vertexAI);
+            GenerativeModel model = new GenerativeModel("gemini-1.5-pro-preview-0514", vertexAI);
             GenerateContentResponse response = model.generateContent(prompt);
             return ResponseHandler.getText(response);
         }

@@ -13,16 +13,13 @@ import java.io.IOException;
 public class GeminiService {
 
     private final String projectId;
-    private final String apiKey;
 
-    public GeminiService(@Value("${google.api.project.id}") String projectId,
-                         @Value("${gemini.api.key}") String apiKey) {
+    public GeminiService(@Value("${google.api.project.id}") String projectId) {
         this.projectId = projectId;
-        this.apiKey = apiKey;
     }
 
     public String getCompletion(String prompt) throws IOException {
-        try (VertexAI vertexAI = new VertexAI(projectId, "asia-northeast3")) { // location: e.g., 서울
+        try (VertexAI vertexAI = new VertexAI(projectId, "asia-northeast3")) {
             GenerativeModel model = new GenerativeModel("gemini-1.0-pro", vertexAI);
             GenerateContentResponse response = model.generateContent(prompt);
             return ResponseHandler.getText(response);

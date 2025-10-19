@@ -26,4 +26,39 @@ public class TeamDto {
     // 팀 응답 (API 결과 반환시 사용)
     public record Res(Long id, String name, String description,
                       String CreatedAt, String UpdatedAt) {}
+
+    // 팀 상세 정보 응답 (멤버 포함)
+    public record DetailRes(
+            Long id,
+            String name,
+            String description,
+            String createdAt,
+            String updatedAt,
+            java.util.List<TeamMembersDto.Res> members,
+            int totalMembers,
+            Long projectId
+    ) {}
+
+    // 프로젝트 시작 준비 상태 응답
+    public record StartReadyRes(
+            boolean isReadyToStart,
+            int totalRequiredPositions,
+            int filledPositions,
+            double completionRate,
+            java.util.List<PositionStatus> positionStatuses,
+            String message
+    ) {}
+
+    // 포지션 상태 정보
+    public record PositionStatus(
+            String role,
+            int required,
+            int current,
+            boolean isFilled
+    ) {}
+
+    // 프로젝트 시작 요청
+    public record StartProjectReq(
+            @NotNull Long projectId
+    ) {}
 }

@@ -54,7 +54,7 @@ public class JwtUtil {
     }
 
     // 토큰에서 모든 클레임 추출
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         try {
             return Jwts.parser()
                     .verifyWith(key) // 서명 키 설정 (새로운 API)

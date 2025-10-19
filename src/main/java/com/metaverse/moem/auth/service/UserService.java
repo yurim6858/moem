@@ -2,12 +2,16 @@ package com.metaverse.moem.auth.service;
 
 import com.metaverse.moem.auth.domain.User;
 import com.metaverse.moem.auth.domain.UserRole;
+import com.metaverse.moem.auth.dto.AuthUserResponseDto;
 import com.metaverse.moem.auth.dto.SignUpRequestDto;
 import com.metaverse.moem.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +38,21 @@ public class UserService {
         );
 
         userRepository.save(user);
+    }
+
+    // 모든 사용자 목록 조회
+    public List<AuthUserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> new AuthUserResponseDto(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getNickname(),
+                        user.getEmail(),
+                        user.getUserRole(),
+                        user.getCreatedAt(),
+                        user.getModifiedAt()
+                ))
+                .collect(Collectors.toList());
     }
 }

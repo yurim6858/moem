@@ -6,9 +6,9 @@ public class TeamMembersDto {
 
     // 팀원 생성 요청
     public record CreateReq(
-            @NotNull Long teamId, // 소속 team Id
             @NotNull Long userId,
-            String role // 역할 정보
+            String role, // 역할 정보
+            String name // 사용자 이름
     ) {}
 
     // 팀원 수정 요청
@@ -23,7 +23,7 @@ public class TeamMembersDto {
     ) {}
 
     // 팀원 응답 (API 결과 반환시 사용)
-    public record Res(Long id, String name, String role, Long teamId,
+    public record Res(Long id, String name, String role, Long teamId, Long userId,
                       String CreatedAt, String UpdatedAt) {}
 
 }

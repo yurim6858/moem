@@ -70,5 +70,16 @@ public class ApplicationController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/{applicationId}/approve-and-invite")
+    public ResponseEntity<ApplicationResponse> approveAndSendInvitation(@PathVariable Long applicationId, 
+                                                                      @RequestHeader("X-Username") String username) {
+        try {
+            ApplicationResponse response = applicationService.approveAndSendInvitation(applicationId, username);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
 

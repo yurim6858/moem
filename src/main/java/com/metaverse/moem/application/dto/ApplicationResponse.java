@@ -13,6 +13,7 @@ public class ApplicationResponse {
     private Long projectId;
     private String applicantUsername;
     private String message;
+    private String appliedPosition; // 지원한 포지션
     private Application.ApplicationStatus status;
     private LocalDateTime appliedAt;
     private LocalDateTime updatedAt;

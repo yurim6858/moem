@@ -31,6 +31,9 @@ public class Application {
     @Column(length = 500)
     private String message;
 
+    @Column(length = 100)
+    private String appliedPosition; // 지원한 포지션
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status;

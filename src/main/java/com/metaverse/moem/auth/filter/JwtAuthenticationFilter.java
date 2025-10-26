@@ -1,12 +1,15 @@
 package com.metaverse.moem.auth.filter;
 
 import com.metaverse.moem.auth.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,9 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
+        
+        System.out.println("JWT Filter: 요청 URL: " + request.getRequestURI());
+        System.out.println("JWT Filter: Authorization 헤더: " + authHeader);
 
         // 2. Authorization 헤더가 없거나 "Bearer "로 시작하지 않으면 JWT가 없는 요청으로 간주(미인증)하고 다음 필터로 진행
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("JWT Filter: Authorization 헤더 없음 또는 Bearer 형식 아님");
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,8 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // 4. JWT 토큰에서 사용자 이름(계정명 *Username)을 추출
             username = jwtUtil.extractUsername(jwt);
+            System.out.println("JWT Filter: 추출된 사용자명: " + username);
         } catch (RuntimeException e) { // JwtUtil에서 발생하는 JwtException(RuntimeException) 처리
             // JWT 토큰 파싱 또는 검증 중 오류가 발생하면 401 Unauthorized 에러 응답
+            System.out.println("JWT Filter: 토큰 검증 실패: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401
             response.getWriter().write(e.getMessage()); // 에러 메시지 반환 (디버깅용)
             return;
@@ -57,12 +66,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 7. 토큰이 유효한지 검증 (사용자 이름 일치, 토큰 만료 여부)
             if (jwtUtil.validateToken(jwt, userDetails)) {
-                // 8. 토큰이 유효하면 Spring Security의 인증 토큰을 생성
+                System.out.println("JWT Filter: 토큰 검증 성공, 인증 설정");
+                
+                // 8. JWT 토큰에서 권한 추출 및 변환
+                Claims claims = jwtUtil.extractAllClaims(jwt);
+                String role = (String) claims.get("role");
+                System.out.println("JWT Filter: 토큰에서 추출한 권한: " + role);
+                
+                // 권한을 Spring Security GrantedAuthority로 변환
+                GrantedAuthority authority = new SimpleGrantedAuthority(role);
+                
+                // 9. 토큰이 유효하면 Spring Security의 인증 토큰을 생성
                 // UsernamePasswordAuthenticationToken은 인증 주체, 자격 증명, 권한을 포함
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, // 인증된 사용자 주체 (UserDetails 객체)
                         null,        // 자격 증명 (비밀번호 등 - 여기서는 이미 토큰으로 인증되었으므로 null)
-                        userDetails.getAuthorities() // 사용자의 권한 목록
+                        java.util.List.of(authority) // JWT 토큰에서 추출한 권한 사용
                 );
 
                 // 9. 요청에 대한 웹 인증 세부 정보(IP 주소, 세션 ID 등)를 설정
@@ -71,6 +90,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 10. SecurityContextHolder에 인증 토큰을 설정
                 // 이렇게 설정하면 현재 요청에 대해 사용자가 인증되었음을 Spring Security에 알림
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                System.out.println("JWT Filter: 토큰 검증 실패");
             }
         }
         // 11. 다음 필터 또는 서블릿으로 요청을 전달

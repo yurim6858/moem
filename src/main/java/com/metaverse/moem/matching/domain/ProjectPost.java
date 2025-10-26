@@ -1,6 +1,7 @@
 package com.metaverse.moem.matching.domain;
 
 import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,11 @@ public class ProjectPost {
     })
     private List<Position> positions = new ArrayList<>();
 
+    // 🔥 팀과 연관관계 설정 (프로젝트당 하나의 팀)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     // 🔥 편의 메서드 추가
     public String getCreatorUsername() {
         return creator != null ? creator.getUsername() : null;
@@ -65,6 +71,14 @@ public class ProjectPost {
 
     public String getCreatorEmail() {
         return creator != null ? creator.getEmail() : null;
+    }
+
+    public Long getTeamId() {
+        return team != null ? team.getId() : null;
+    }
+
+    public String getTeamName() {
+        return team != null ? team.getName() : null;
     }
 
     @Embeddable

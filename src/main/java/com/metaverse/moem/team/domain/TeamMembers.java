@@ -1,5 +1,6 @@
 package com.metaverse.moem.team.domain;
 
+import com.metaverse.moem.auth.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,9 +23,10 @@ public class TeamMembers {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    // user FK 연관관계
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    // user FK 연관관계 - User 엔티티와 직접 연관관계 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(length = 20, nullable = false)
     private String name;
@@ -45,6 +47,11 @@ public class TeamMembers {
 
     public void updateName(String name) {
         this.name = name;
+    }
+    
+    // 편의 메서드: userId 반환
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
     }
 
 }

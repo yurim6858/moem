@@ -8,5 +8,6 @@ import lombok.Setter;
 public class ApplicationRequest {
     private Long projectId;
     private String message;
+    private String appliedPosition; // 지원한 포지션
 }
 

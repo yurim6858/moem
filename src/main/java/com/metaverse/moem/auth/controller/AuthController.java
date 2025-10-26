@@ -3,6 +3,7 @@ package com.metaverse.moem.auth.controller;
 // ... 기존 임포트 ...
 
 import com.metaverse.moem.auth.dto.AuthResponseDto;
+import com.metaverse.moem.auth.dto.AuthUserResponseDto;
 import com.metaverse.moem.auth.dto.LoginRequestDto;
 import com.metaverse.moem.auth.dto.SignUpRequestDto;
 import com.metaverse.moem.auth.service.UserService;
@@ -17,11 +18,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -80,6 +79,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseDto(null, null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AuthResponseDto(null, null));
+        }
+    }
+
+    @GetMapping("/auth/users")
+    public ResponseEntity<List<AuthUserResponseDto>> getAllUsers() {
+        try {
+            List<AuthUserResponseDto> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

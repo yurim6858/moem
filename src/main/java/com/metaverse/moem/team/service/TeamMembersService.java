@@ -1,12 +1,12 @@
 package com.metaverse.moem.team.service;
 
+import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.auth.repository.UserRepository;
 import com.metaverse.moem.team.domain.Team;
 import com.metaverse.moem.team.domain.TeamMembers;
-import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.team.dto.TeamMembersDto;
 import com.metaverse.moem.team.repository.TeamMembersRepository;
 import com.metaverse.moem.team.repository.TeamRepository;
-import com.metaverse.moem.matching.repository.UserPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +21,20 @@ public class TeamMembersService {
 
     private final TeamMembersRepository teamMembersRepository;
     private final TeamRepository teamRepository;
-    private final UserPostRepository userPostRepository;
+    private final UserRepository userRepository;
 
     // 팀원 생성
     public TeamMembersDto.Res create(Long teamId, TeamMembersDto.CreateReq req) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 팀이 존재하지 않습니다."));
 
-        UserPost user = userPostRepository.findById(req.userId())
+        User user = userRepository.findById(req.userId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         TeamMembers member = TeamMembers.builder()
                 .team(team)
-                .userId(req.userId())
+                .user(user)
+                .name(req.name() != null ? req.name() : user.getUsername())
                 .role(req.role())
                 .status("Active")
                 .joinAt(LocalDateTime.now())
@@ -43,9 +44,10 @@ public class TeamMembersService {
 
         return new TeamMembersDto.Res(
                 saved.getId(),
-                user.getUsername(),
+                saved.getName(),
                 saved.getRole(),
                 saved.getTeam().getId(),
+                saved.getUserId(),
                 saved.getJoinAt().toString(),
                 saved.getJoinAt().toString()
         );
@@ -73,6 +75,7 @@ public class TeamMembersService {
                 member.getName(),
                 member.getRole(),
                 member.getTeam().getId(),
+                member.getUserId(),
                 member.getJoinAt().toString(),
                 LocalDateTime.now().toString()
         );
@@ -93,14 +96,12 @@ public class TeamMembersService {
 
         return members.stream()
                 .map(member -> {
-                    UserPost user = userPostRepository.findById(member.getUserId())
-                            .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-
                     return new TeamMembersDto.Res(
                             member.getId(),
-                            user.getUsername(),
+                            member.getName(),
                             member.getRole(),
                             member.getTeam().getId(),
+                            member.getUserId(),
                             member.getJoinAt().toString(),
                             LocalDateTime.now().toString()
                     );

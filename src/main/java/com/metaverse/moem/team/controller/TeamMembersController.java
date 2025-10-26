@@ -20,7 +20,7 @@ public class TeamMembersController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TeamMembersDto.Res create(@PathVariable Long teamId, @RequestBody @Valid TeamMembersDto.CreateReq req) {
-        return  teamMembersService.create(teamId, req);
+        return teamMembersService.create(teamId, req);
     }
 
     // 팀원 조회

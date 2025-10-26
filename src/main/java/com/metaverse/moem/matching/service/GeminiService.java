@@ -2,6 +2,7 @@ package com.metaverse.moem.matching.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class GeminiService {
 
@@ -23,7 +25,7 @@ public class GeminiService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String geminiApiUrl = "https://global-aiplatform.googleapis.com/v1/projects/%s/locations/global/publishers/google/models/gemini-1.5-pro-latest:generateContent?key=%s";
+    private final String geminiApiUrl = "https://aiplatform.googleapis.com/v1/projects/%s/locations/global/publishers/google/models/gemini-1.5-pro-latest:generateContent?key=%s";
 
     public String getCompletion(String prompt) throws IOException {
         String url = String.format(geminiApiUrl, projectId, apiKey);
@@ -31,27 +33,30 @@ public class GeminiService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        String escapedPrompt = objectMapper.writeValueAsString(prompt);
         String requestBody = String.format("""
                 {
                   "contents": [
                     {
                       "parts": [
-                        { "text": "%s" }
+                        { "text": %s }
                       ]
                     }
                   ]
                 }
-                """, prompt);
+                """, escapedPrompt);
 
-        // 3. HTTP 요청 생성
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        // 4. API 호출 및 응답 받기
-        String responseJson = restTemplate.postForObject(url, requestEntity, String.class);
-
-        // 5. 복잡한 JSON 응답에서 텍스트만 추출
-        return parseGeminiResponse(responseJson);
+        try {
+            String responseJson = restTemplate.postForObject(url, requestEntity, String.class);
+            return parseGeminiResponse(responseJson);
+        } catch (Exception e) {
+            log.error("Gemini API 호출 실패: {}", e.getMessage());
+            throw new IOException("Gemini API 호출에 실패했습니다.", e);
+        }
     }
+
 
     private String parseGeminiResponse(String responseJson) throws IOException {
         try {
@@ -59,7 +64,7 @@ public class GeminiService {
             JsonNode textNode = root.path("candidates").get(0).path("content").path("parts").get(0).path("text");
             return textNode.asText();
         } catch (Exception e) {
-            System.err.println("Gemini 응답 파싱 실패: " + responseJson);
+            log.error("Gemini 응답 파싱 실패. 응답 내용: {}", responseJson, e);
             throw new IOException("Gemini 응답을 파싱하는 데 실패했습니다.", e);
         }
     }

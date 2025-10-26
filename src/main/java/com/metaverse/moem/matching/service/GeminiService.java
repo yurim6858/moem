@@ -8,64 +8,71 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
-@Slf4j
 @Service
+@Slf4j
 public class GeminiService {
-
-    @Value("${google.api.project.id}")
-    private String projectId;
 
     @Value("${gemini.api.key}")
     private String apiKey;
 
+    @Value("${gemini.model:gemini-2.5-pro}")
+    private String model;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String geminiApiUrl = "https://aiplatform.googleapis.com/v1/projects/%s/locations/global/publishers/google/models/gemini-1.5-pro-latest:generateContent?key=%s";
+    private String endpoint() {
+        return "https://generativelanguage.googleapis.com/v1/models/"
+                + model + ":generateContent?key=" + apiKey;
+    }
 
     public String getCompletion(String prompt) throws IOException {
-        String url = String.format(geminiApiUrl, projectId, apiKey);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String escapedPrompt = objectMapper.writeValueAsString(prompt);
-        String requestBody = String.format("""
-                {
-                  "contents": [
-                    {
-                      "parts": [
-                        { "text": %s }
-                      ]
-                    }
-                  ]
-                }
-                """, escapedPrompt);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        String body = """
+        {
+          "contents": [
+            {
+              "role": "user",
+              "parts": [ { "text": %s } ]
+            }
+          ]
+        }
+        """.formatted(objectMapper.writeValueAsString(prompt));
 
         try {
-            String responseJson = restTemplate.postForObject(url, requestEntity, String.class);
-            return parseGeminiResponse(responseJson);
-        } catch (Exception e) {
-            log.error("Gemini API 호출 실패: {}", e.getMessage());
-            throw new IOException("Gemini API 호출에 실패했습니다.", e);
+            String res = restTemplate.postForObject(
+                    endpoint(),
+                    new HttpEntity<>(body, headers),
+                    String.class
+            );
+            return parseGeminiResponse(res);
+        } catch (HttpClientErrorException.NotFound nf) {
+            log.warn("Model {} 404 → fallback to gemini-2.5-flash", model);
+            String fallbackUrl =
+                    "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + apiKey;
+            String res = restTemplate.postForObject(
+                    fallbackUrl,
+                    new HttpEntity<>(body, headers),
+                    String.class
+            );
+            return parseGeminiResponse(res);
+        } catch (Exception error) {
+            log.error("Gemini(API key) 호출 실패: {}", error.getMessage(), error);
+            throw new IOException("Gemini API 호출에 실패했습니다.", error);
         }
     }
 
-
     private String parseGeminiResponse(String responseJson) throws IOException {
-        try {
-            JsonNode root = objectMapper.readTree(responseJson);
-            JsonNode textNode = root.path("candidates").get(0).path("content").path("parts").get(0).path("text");
-            return textNode.asText();
-        } catch (Exception e) {
-            log.error("Gemini 응답 파싱 실패. 응답 내용: {}", responseJson, e);
-            throw new IOException("Gemini 응답을 파싱하는 데 실패했습니다.", e);
-        }
+        JsonNode root = objectMapper.readTree(responseJson);
+        return root.path("candidates").get(0)
+                .path("content").path("parts").get(0)
+                .path("text").asText();
     }
 }

@@ -16,27 +16,26 @@ public class PersonalScheduleService {
     private final PersonalAssignmentRepository personalAssignmentRepository;
 
     public List<PersonalScheduleDto.Res> getSchedules(Long userId) {
-        LocalDateTime now =  LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         List<PersonalAssignment> assignments = personalAssignmentRepository.findAllByUserId(userId);
 
-        // auto-delete : userCreated == true && 마감 지남
-        assignments.removeIf(a -> {
-            if (a.isUserCreated() && a.getDueAt().isBefore(now)){
-                personalAssignmentRepository.delete(a);
+        assignments.removeIf(personalAssignment -> {
+            if (personalAssignment.isUserCreated() && personalAssignment.getDueAt().isBefore(now)) {
+                personalAssignmentRepository.delete(personalAssignment);
                 return true;
             }
             return false;
         });
 
         return assignments.stream()
-                .map(a -> new PersonalScheduleDto.Res(
-                        a.getId(),
-                        a.getTitle(),
-                        a.getDescription(),
-                        a.getDueAt(),
-                        a.isUserCreated(),
-                        calculateStatus(a.getDueAt(),a.getCreatedAt(), now)
+                .map(personalAssignment -> new PersonalScheduleDto.Res(
+                        personalAssignment.getId(),
+                        personalAssignment.getTitle(),
+                        personalAssignment.getDescription(),
+                        personalAssignment.getDueAt(),
+                        personalAssignment.isUserCreated(),
+                        calculateStatus(personalAssignment.getDueAt(), personalAssignment.getCreatedAt(), now)
                 ))
                 .toList();
     }

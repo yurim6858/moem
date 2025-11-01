@@ -1,13 +1,14 @@
 package com.metaverse.moem.project.service;
 
 import com.metaverse.moem.project.domain.Project;
-import com.metaverse.moem.project.domain.ProjectType;
 import com.metaverse.moem.project.dto.ProjectDto;
 import com.metaverse.moem.project.repository.ProjectRepository;
+import com.metaverse.moem.team.domain.Team;
+import com.metaverse.moem.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,69 +17,66 @@ import java.util.Optional;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final TeamRepository teamRepository;
 
-    // 생성
+    @Transactional
     public ProjectDto.Res create(ProjectDto.CreateReq req) {
-        Project project = Project.builder()
-                .name(req.name())
-                .type(req.type())
-                .ownerId(req.ownerId())
-                .createdAt(java.time.LocalDateTime.now())
-                .isDeleted(false)
-                .build();
+        Project project = new Project();
+        project.setName(req.name());
+        project.setDescription(req.description());
+        project.setType(req.type());
+        project.setRecruitTotal(req.recruitTotal());
+        project.setRecruitCurrent(0);
+        project.setRecruitStartDate(req.recruitStartDate());
+        project.setRecruitEndDate(req.recruitEndDate());
+        project.setProjectStartDate(req.projectStartDate());
+        project.setProjectEndDate(req.projectEndDate());
 
-        Project saved = projectRepository.save(project);
-        return toRes(saved);
+        projectRepository.save(project);
+
+
+        Team team = Team.create(project, req.teamName(), null);
+        teamRepository.save(team);
+
+        project.setTeam(team);
+
+        return ProjectDto.Res.from(project);
     }
 
-    // 단일 조회
+    @Transactional(readOnly = true)
     public Optional<ProjectDto.Res> get(Long id) {
-        return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
-                .map(this::toRes);
+        return projectRepository.findByIdAndIsDeletedFalse(id).map(ProjectDto.Res::from);
     }
 
-    // 소유자별 조회
-    public List<ProjectDto.Res> listByOwner(ProjectType type, Long ownerId) {
-        return projectRepository.findByTypeAndOwnerIdAndIsDeletedFalse(type, ownerId)
-                .stream()
-                .map(this::toRes)
-                .toList();
+    @Transactional(readOnly = true)
+    public List<ProjectDto.Res> listPublic(ProjectDto.SearchCondition condition) {
+        return projectRepository.searchPublic(condition.type(), condition.status(), condition.query())
+                .stream().map(ProjectDto.Res::from).toList();
     }
 
-
-    // 수정
-    public Optional<ProjectDto.Res> update(Long id,ProjectDto.UpdateReq req) {
-        return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
+    @Transactional
+    public Optional<ProjectDto.Res> update(Long id, ProjectDto.UpdateReq req) {
+        return projectRepository.findByIdAndIsDeletedFalse(id)
                 .map(project -> {
-                    project.setName( req.name());
-                    project.setUpdatedAt(LocalDateTime.now());
-                    return toRes(projectRepository.save(project));
+                    project.setName(req.name());
+                    project.setDescription(req.description());
+                    project.setType(req.type());
+                    project.setRecruitTotal(req.recruitTotal());
+                    project.setRecruitStartDate(req.recruitStartDate());
+                    project.setRecruitEndDate(req.recruitEndDate());
+                    project.setProjectStartDate(req.projectStartDate());
+                    project.setProjectEndDate(req.projectEndDate());
+                    return ProjectDto.Res.from(project);
                 });
     }
 
-    // 삭제
+    @Transactional
     public boolean delete(Long id) {
-        return projectRepository.findById(id)
-                .filter(p -> !p.isDeleted())
+        return projectRepository.findByIdAndIsDeletedFalse(id)
                 .map(project -> {
                     project.setDeleted(true);
-                    project.setUpdatedAt(LocalDateTime.now());
-                    projectRepository.save(project);
                     return true;
                 })
                 .orElse(false);
     }
-
-    private ProjectDto.Res toRes(Project p) {
-        return new ProjectDto.Res(
-                p.getId(),
-                p.getName(),
-                p.getType(),
-                p.getOwnerId()
-        );
-    }
-
-
 }

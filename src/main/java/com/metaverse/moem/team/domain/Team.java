@@ -1,43 +1,89 @@
 package com.metaverse.moem.team.domain;
 
-
+import com.metaverse.moem.common.BaseTimeEntity;
+import com.metaverse.moem.project.domain.Project;
 import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자 (외부 무분별 사용 금지용 PROTECTED)
-@AllArgsConstructor
-@Builder // 빌더 패턴 제공
 @Entity
-@Table(name = "teams") // DB Table 및 매핑, 테이블 이름 "teams"
-public class Team {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "team")
+public class Team extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // PK, Auto_Increment
     private Long id;
 
-    @Column(nullable = false, length = 60, unique = true)
-    // 팀이름, 필수항목, 길이제한, 중복불가
-    private String name;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false, unique = true)
+    private Project project;
 
-    @Column(length = 255)
-    // 간략한 팀설명
-    private String description;
-
-    @Column(nullable = false, updatable = false)
-    // 팀 생성시점 기록
-    private LocalDateTime createdAt;
+    @Column(nullable = false, length = 50)
+    private String  name;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private Integer maxMembers;
 
-    @PrePersist // INSERT 되기 전 자동 실행 → 생성일/수정일 초기화
-    void onCreate(){ createdAt = LocalDateTime.now(); updatedAt = createdAt; }
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMembers> members = new ArrayList<>();
 
-    @PreUpdate  // UPDATE 되기 전 자동 실행 → 수정일 갱신
-    void onUpdate(){ updatedAt = LocalDateTime.now(); }
+    @OneToMany (mappedBy = "team",cascade = CascadeType.ALL, orphanRemoval = true)
+    private  List<Meeting> meetings = new ArrayList<>();
 
+    @Builder
+    private Team(Project project, String name, Integer maxMembers) {
+        this.project = project;
+        this.name = name;
+        this.maxMembers = maxMembers == null ? 0 : maxMembers;
+    }
+
+    public static Team create(Project project, String name, Integer maxMembers) {
+        Team team = new Team();
+        team.project = project;
+        team.maxMembers = maxMembers;
+        team.name = (name == null || name.isBlank())
+                ? project.getName()
+                : name;
+        return team;
+    }
+
+    public void addMember(TeamMembers member) {
+        if (member == null) return;
+        members.add(member);
+        member.setTeam(this);
+    }
+
+    public void removeMember(TeamMembers member) {
+        if (member == null) return;
+        members.remove(member);
+        member.setTeam(null);
+    }
+
+    public void addMeeting(Meeting meeting) {
+        if (meeting == null) return;
+        meetings.add(meeting);
+        meeting.setTeam(this);
+    }
+
+    public void removeMeeting(Meeting meeting) {
+        if (meeting == null) return;
+        meetings.remove(meeting);
+        meeting.setTeam(null);
+    }
+
+    public void changeProject(Project project) {
+        this.project = project;
+    }
+
+    public void updateInfo(String name, Integer maxMembers) {
+        if (name != null && !name.isBlank()) this.name = name;
+        if (maxMembers != null) this.maxMembers = maxMembers;
+    }
 }

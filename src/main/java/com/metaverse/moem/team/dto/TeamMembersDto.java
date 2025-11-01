@@ -1,29 +1,34 @@
 package com.metaverse.moem.team.dto;
 
-import jakarta.validation.constraints.NotNull;
+import com.metaverse.moem.team.domain.Role;
+import com.metaverse.moem.team.domain.TeamMembers;
+import lombok.Builder;
 
 public class TeamMembersDto {
 
-    // 팀원 생성 요청
-    public record CreateReq(
-            @NotNull Long userId,
-            String role, // 역할 정보
-            String name // 사용자 이름
-    ) {}
+    public record CreateReq(Long userId) {}
 
-    // 팀원 수정 요청
-    public record UpdateReq(
-            String name,
-            String role
-    ) {}
+    public record UpdateReq(Role role) {}
 
-    // 팀원 삭제 요청
-    public record  DeleteReq(
-            @NotNull Long id
-    ) {}
-
-    // 팀원 응답 (API 결과 반환시 사용)
-    public record Res(Long id, String name, String role, Long teamId, Long userId,
-                      String CreatedAt, String UpdatedAt) {}
+    @Builder
+    public record Res(
+            Long id,
+            Long teamId,
+            Long userId,
+            Role role,
+            String createdAt,
+            String updatedAt
+    ) {
+        public static Res from(TeamMembers members) {
+            return Res.builder()
+                    .id(members.getId())
+                    .teamId(members.getTeam().getId())
+                    .userId(members.getUserId())
+                    .role(members.getRole())
+                    .createdAt(members.getCreatedAt() == null ? null : members.getCreatedAt().toString())
+                    .updatedAt(members.getUpdatedAt() == null ? null : members.getUpdatedAt().toString())
+                    .build();
+        }
+    }
 
 }

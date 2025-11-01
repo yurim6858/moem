@@ -1,57 +1,45 @@
 package com.metaverse.moem.team.domain;
 
-import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Entity
 @Getter
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-@Table(name = "team_member")
-public class TeamMembers {
+@Table(name = "team_member",
+    uniqueConstraints = @UniqueConstraint(name = "uk_team_member_team_user", columnNames = {"team_id", "user_id"})
+)
+public class TeamMembers extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // team FK 연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    // user FK 연관관계 - User 엔티티와 직접 연관관계 설정
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @Column(length = 20, nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false,length = 20)
+    private Role role;
 
-
-    @Column(length = 20, nullable = false)
-    private String role;
-
-    @Column(length = 20, nullable = false)
-    private String status;
-
-    @Column(name = "join_at", nullable = false)
-    private LocalDateTime joinAt;
-
-    public void updateRole(String role) {
-        this.role = role;
+    public static TeamMembers create(Team team, Long userId, Role role) {
+        TeamMembers members = new TeamMembers();
+        members.team = team;
+        members.userId = userId;
+        members.role = (role == null ? Role.MEMBER : role);
+        return members;
     }
 
-    public void updateName(String name) {
-        this.name = name;
-    }
-    
-    // 편의 메서드: userId 반환
-    public Long getUserId() {
-        return user != null ? user.getId() : null;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
+    public void changeRole(Role role) {
+        if (role != null) this.role = role;
+    }
 }

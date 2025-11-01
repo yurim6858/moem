@@ -1,41 +1,45 @@
 package com.metaverse.moem.project.domain;
 
+import com.metaverse.moem.common.BaseTimeEntity;
 import com.metaverse.moem.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Project {
+@Table(name = "project")
+public class Project extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name; // project name
+    @Column(nullable = false,length = 100)
+    private String name;
+
+    @Column(length = 1000)
+    private String description;
+    private Integer recruitTotal;
+    private Integer recruitCurrent;
+    private LocalDate recruitStartDate;
+    private LocalDate recruitEndDate;
+    private LocalDate projectStartDate;
+    private LocalDate projectEndDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectType type; // Team or Personal
+    private ProjectType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
+    @OneToOne (fetch = FetchType.LAZY, mappedBy = "project")
     private Team team;
 
+    @Column(nullable = false)
+    private Long ownerId;
 
     @Column(nullable = false)
-    private Long ownerId; // team or user ID
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     private boolean isDeleted;
 
 }

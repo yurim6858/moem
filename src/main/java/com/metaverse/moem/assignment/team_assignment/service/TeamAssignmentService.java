@@ -57,14 +57,14 @@ public class TeamAssignmentService {
         teamAssignmentRepository.deleteById(teamAssignmentId);
     }
 
-    private TeamAssignmentDto.Res toRes(TeamAssignment a) {
+    private TeamAssignmentDto.Res toRes(TeamAssignment teamAssignment) {
         return new TeamAssignmentDto.Res(
-                a.getId(),
-                a.getProject().getId(),
-                a.getUserId(),
-                a.getTitle(),
-                a.getDescription(),
-                a.getDueAt()
+                teamAssignment.getId(),
+                teamAssignment.getProject().getId(),
+                teamAssignment.getUserId(),
+                teamAssignment.getTitle(),
+                teamAssignment.getDescription(),
+                teamAssignment.getDueAt()
         );
     }
 }

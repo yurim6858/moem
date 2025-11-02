@@ -170,17 +170,26 @@ public class TeamInvitationService {
     private void addToTeam(TeamInvitation invitation) {
         try {
             // 초대 메시지에서 포지션 정보 추출
-            String position = extractPositionFromMessage(invitation.getMessage());
+            String positionStr = extractPositionFromMessage(invitation.getMessage());
+            
+            // Role enum으로 변환 (기본값은 MEMBER)
+            com.metaverse.moem.team.domain.Role role = com.metaverse.moem.team.domain.Role.MEMBER;
+            if (positionStr != null) {
+                try {
+                    role = com.metaverse.moem.team.domain.Role.valueOf(positionStr.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    // 유효하지 않은 Role이면 기본값 사용
+                    role = com.metaverse.moem.team.domain.Role.MEMBER;
+                }
+            }
             
             // TeamMembersService를 통해 팀 멤버 추가
             com.metaverse.moem.team.dto.TeamMembersDto.CreateReq createReq = 
                 new com.metaverse.moem.team.dto.TeamMembersDto.CreateReq(
-                    invitation.getInvitedUser().getId(),
-                    position != null ? position : "Member", // 포지션이 있으면 사용, 없으면 기본값
-                    invitation.getInvitedUser().getUsername()
+                    invitation.getInvitedUser().getId()
                 );
             
-            teamMembersService.create(invitation.getTeamId(), createReq);
+            teamMembersService.create(invitation.getTeam().getId(), createReq, role);
         } catch (Exception e) {
             // 팀 멤버 추가 실패 시 초대 상태 롤백
             invitation.setStatus(TeamInvitation.InvitationStatus.PENDING);
@@ -207,7 +216,7 @@ public class TeamInvitationService {
     private boolean isAlreadyTeamMember(Long teamId, Long userId) {
         try {
             List<com.metaverse.moem.team.dto.TeamMembersDto.Res> members = 
-                teamMembersService.getMembersByTeamId(teamId);
+                teamMembersService.list(teamId);
             return members.stream()
                     .anyMatch(member -> member.userId().equals(userId));
         } catch (Exception e) {

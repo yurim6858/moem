@@ -10,10 +10,12 @@ import com.metaverse.moem.team.domain.Team;
 import com.metaverse.moem.team.domain.TeamMembers;
 import com.metaverse.moem.team.repository.TeamRepository;
 import com.metaverse.moem.team.repository.TeamMembersRepository;
+import com.metaverse.moem.project.domain.Project;
+import com.metaverse.moem.project.repository.ProjectRepository;
+import com.metaverse.moem.project.domain.ProjectType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,15 +27,18 @@ public class ProjectPostService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final TeamMembersRepository teamMembersRepository;
+    private final ProjectRepository projectRepository;
 
     public ProjectPostService(ProjectPostRepository projectPostRepository, 
                              UserRepository userRepository,
                              TeamRepository teamRepository,
-                             TeamMembersRepository teamMembersRepository) {
+                             TeamMembersRepository teamMembersRepository,
+                             ProjectRepository projectRepository) {
         this.projectPostRepository = projectPostRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.teamMembersRepository = teamMembersRepository;
+        this.projectRepository = projectRepository;
     }
 
     public MatchingResponse create(MatchingRequest req) {
@@ -220,11 +225,23 @@ public class ProjectPostService {
             
             System.out.println("ProjectPostService: 최종 팀 이름: " + teamName);
             
-            // 팀 생성
-            Team team = Team.builder()
-                    .name(teamName)
-                    .description(project.getIntro() != null ? project.getIntro() : "프로젝트 팀")
-                    .build();
+            // Project 엔티티 생성 (Team 생성에 필요)
+            Project projectEntity = new Project();
+            projectEntity.setName(project.getTitle());
+            projectEntity.setDescription(project.getIntro());
+            projectEntity.setOwnerId(creator.getId());
+            projectEntity.setType(ProjectType.DEVELOPMENT); // 기본값으로 DEVELOPMENT 사용
+            projectEntity.setRecruitCurrent(0);
+            projectEntity.setRecruitTotal(project.getPositions().stream()
+                    .mapToInt(pos -> pos.getHeadcount() != null ? pos.getHeadcount() : 0)
+                    .sum());
+            // isDeleted는 기본값 false로 초기화됨
+            
+            // Project 저장
+            Project savedProject = projectRepository.save(projectEntity);
+            
+            // 팀 생성 (maxMembers는 null로 설정하면 기본값 0으로 설정됨)
+            Team team = Team.create(savedProject, teamName, null);
             
             System.out.println("ProjectPostService: 팀 엔티티 생성 완료");
             Team savedTeam = teamRepository.save(team);
@@ -236,14 +253,11 @@ public class ProjectPostService {
             System.out.println("ProjectPostService: 프로젝트에 팀 연결 완료");
             
             // 프로젝트 작성자를 팀장으로 추가
-            TeamMembers teamLeader = TeamMembers.builder()
-                    .team(savedTeam)
-                    .user(creator)
-                    .name(creator.getUsername() != null ? creator.getUsername() : "Unknown")
-                    .role("Leader")
-                    .status("Active")
-                    .joinAt(LocalDateTime.now())
-                    .build();
+            TeamMembers teamLeader = TeamMembers.create(
+                    savedTeam, 
+                    creator.getId(), 
+                    com.metaverse.moem.team.domain.Role.MANAGER
+            );
             
             System.out.println("ProjectPostService: 팀 멤버 엔티티 생성 완료");
             teamMembersRepository.save(teamLeader);
@@ -267,7 +281,6 @@ public class ProjectPostService {
             }
             
             System.out.println("팀 동기화 시작 - 팀명: " + team.getName());
-            System.out.println("현재 팀 설명: " + team.getDescription());
             System.out.println("새 프로젝트 소개: " + project.getIntro());
             
             boolean updated = false;
@@ -277,28 +290,16 @@ public class ProjectPostService {
                 String newName = project.getTitle();
                 if (!newName.equals(team.getName())) {
                     System.out.println("팀 이름 업데이트: " + team.getName() + " -> " + newName);
-                    team.setName(newName);
+                    team.updateInfo(newName, team.getMaxMembers());
                     updated = true;
                 } else {
                     System.out.println("팀 이름이 동일하여 업데이트하지 않음");
                 }
             }
             
-            // 팀 설명을 프로젝트 소개로 업데이트
-            if (project.getIntro() != null && !project.getIntro().trim().isEmpty()) {
-                String newDescription = project.getIntro();
-                if (!newDescription.equals(team.getDescription())) {
-                    System.out.println("팀 설명 업데이트: " + team.getDescription() + " -> " + newDescription);
-                    team.setDescription(newDescription);
-                    updated = true;
-                } else {
-                    System.out.println("팀 설명이 동일하여 업데이트하지 않음");
-                }
-            }
-            
             if (updated) {
                 teamRepository.save(team);
-                System.out.println("팀 정보 동기화 완료: " + team.getName() + " - 이름 및 설명 업데이트");
+                System.out.println("팀 정보 동기화 완료: " + team.getName() + " - 이름 업데이트");
             } else {
                 System.out.println("업데이트할 내용이 없음");
             }

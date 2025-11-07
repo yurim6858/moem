@@ -1,5 +1,6 @@
 package com.metaverse.moem.auth.config;
 
+import com.metaverse.moem.auth.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +22,10 @@ import org.springframework.http.HttpMethod;
 @RequiredArgsConstructor
 public class SecurityConfig {
     
-    // DEBUG 로그 활성화
-    static {
-        System.setProperty("logging.level.org.springframework.security", "DEBUG");
-        System.setProperty("logging.level.org.springframework.web", "DEBUG");
-    }
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    // 주의: DEBUG 로그는 프로덕션에서 제거하는 것이 좋습니다.
+    // 필요시 application.yml에서 설정하세요.
 
     // 비밀번호 인코더 (BCrypt)를 Bean으로 등록
     @Bean
@@ -50,7 +50,9 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
+                // JWT 필터 추가 (UsernamePasswordAuthenticationFilter 전에 실행)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                
                 // 인가(Authorization, 엔드포인트의 접근 권한) 규칙 정의:
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()  // 모든 요청 허용

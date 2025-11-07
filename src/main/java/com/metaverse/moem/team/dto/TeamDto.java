@@ -32,15 +32,27 @@ public class TeamDto {
             String name,
             Integer maxMembers,
             String createdAt,
-            String updatedAt
+            String updatedAt,
+            Long projectId
     ) {
         public static Res from(Team team) {
+            Long projectId = null;
+            try {
+                if (team.getProject() != null) {
+                    projectId = team.getProject().getId();
+                }
+            } catch (Exception e) {
+                // LAZY 로딩 실패 시 null 유지
+                projectId = null;
+            }
+            
             return Res.builder()
                     .id(team.getId())
-                    .name(team.getName())
-                    .maxMembers(team.getMaxMembers())
-                    .createdAt(team.getCreatedAt() == null ? null : team.getCreatedAt().toString())
-                    .updatedAt(team.getUpdatedAt() == null ? null : team.getUpdatedAt().toString())
+                    .name(team.getName() != null ? team.getName() : "")
+                    .maxMembers(team.getMaxMembers() != null ? team.getMaxMembers() : 0)
+                    .createdAt(team.getCreatedAt() != null ? team.getCreatedAt().toString() : "")
+                    .updatedAt(team.getUpdatedAt() != null ? team.getUpdatedAt().toString() : "")
+                    .projectId(projectId)
                     .build();
         }
     }

@@ -5,12 +5,14 @@ import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRe
 import com.metaverse.moem.schedule.team_schedule.dto.TeamScheduleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TeamScheduleService {
 
     private final TeamAssignmentRepository teamAssignmentRepository;

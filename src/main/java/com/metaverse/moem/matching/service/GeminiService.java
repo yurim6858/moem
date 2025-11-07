@@ -3,6 +3,7 @@ package com.metaverse.moem.matching.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,9 +16,10 @@ import java.io.IOException;
 
 @Service
 @Slf4j
+@ConditionalOnExpression("!'${gemini.api.key:}'.isEmpty()") // API 키가 비어있지 않을 때만 등록
 public class GeminiService {
 
-    @Value("${gemini.api.key}")
+    @Value("${gemini.api.key:}")
     private String apiKey;
 
     @Value("${gemini.model:gemini-2.5-pro}")

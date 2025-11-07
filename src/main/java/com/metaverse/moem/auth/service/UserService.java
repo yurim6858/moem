@@ -21,7 +21,13 @@ public class UserService {
 
     @Transactional
     public void registerUser(SignUpRequestDto signUpRequestDto) {
-        if (userRepository.existsByUsername(signUpRequestDto.getUsername())) {
+        // username 유효성 검사 (영문, 숫자, 언더스코어만 허용)
+        String username = signUpRequestDto.getUsername();
+        if (username != null && !username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("아이디는 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.");
+        }
+
+        if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username 사용자 계정이 사용중입니다.");
         }
 

@@ -72,6 +72,10 @@ public class Application {
         return applicant != null ? applicant.getEmail() : null;
     }
 
+    public Long getApplicantId() {
+        return applicant != null ? applicant.getId() : null;
+    }
+
     // 🔥 비즈니스 로직 메서드
     public boolean isFromSameUser(User user) {
         return applicant != null && applicant.getId().equals(user.getId());

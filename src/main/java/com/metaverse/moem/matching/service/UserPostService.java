@@ -23,13 +23,10 @@ public class UserPostService {
 
     @Transactional
     public UserResponse createUserPost(UserRequest request) {
-        // 기존 User 조회 또는 생성
+        // 기존 User 조회 (UserPost는 기존 인증된 User에 연결되어야 함)
+        // 새로운 User 생성은 인증 시스템을 통해 해야 합니다.
         User auth = userRepository.findByEmail(request.getEmail())
-                .orElseGet(() -> {
-                    // User가 없으면 새로 생성
-                    User newUser = new User(request.getUsername(), request.getUsername(), "default_password", request.getEmail(), null);
-                    return userRepository.save(newUser);
-                });
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. 먼저 회원가입을 해주세요."));
         
         // 이미 UserPost가 있는지 확인 (username 기준)
         if (userPostRepository.findByAuth_Username(request.getUsername()).isPresent()) {

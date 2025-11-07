@@ -2,8 +2,8 @@ package com.metaverse.moem.matching.service;
 
 import com.metaverse.moem.matching.domain.User;
 import com.metaverse.moem.matching.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,17 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Profile({"default","mock"})
 public class AIMatchService {
 
     private final UserRepository userRepository;
     private final GeminiService geminiService;
+
+    public AIMatchService(UserRepository userRepository, 
+                         @Autowired(required = false) GeminiService geminiService) {
+        this.userRepository = userRepository;
+        this.geminiService = geminiService;
+    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -50,6 +55,13 @@ public class AIMatchService {
     public String getAiRecommendationReason(Long userId) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+
+        // GeminiService가 없는 경우 (mock 프로필 등) 기본 메시지 반환
+        if (geminiService == null) {
+            log.warn("GeminiService를 사용할 수 없습니다. 기본 메시지를 반환합니다.");
+            return String.format("이 팀원은 %s 기술을 보유하고 있어 프로젝트에 도움이 될 것입니다.", 
+                    String.join(", ", user.getSkills()));
+        }
 
         String prompt = String.format(
                 "개발자 프로필: {이름: %s, 역할: %s, 보유 기술: %s, 소개: %s}. " +

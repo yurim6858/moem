@@ -63,6 +63,32 @@ public class ProjectPost {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+    
+    @Column(nullable = false)
+    private boolean isDeleted = false;  // Soft delete를 위한 필드
+    
+    @Column(nullable = false)
+    private boolean isRecruitmentCompleted = false;  // 모집 완료 여부
+
+    // 편의 메서드: 삭제 표시
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+
+    // 편의 메서드: 삭제 여부 확인
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+    
+    // 편의 메서드: 모집 완료 표시
+    public void setRecruitmentCompleted(boolean completed) {
+        this.isRecruitmentCompleted = completed;
+    }
+    
+    // 편의 메서드: 모집 완료 여부 확인
+    public boolean isRecruitmentCompleted() {
+        return isRecruitmentCompleted;
+    }
 
     // 🔥 편의 메서드 추가
     public String getCreatorUsername() {

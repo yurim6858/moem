@@ -7,16 +7,19 @@ import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TeamAssignmentService {
 
     private final TeamAssignmentRepository teamAssignmentRepository;
     private final ProjectRepository projectRepository;
 
+    @Transactional
     public TeamAssignmentDto.Res create(TeamAssignmentDto.CreateReq req) {
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new IllegalArgumentException("프로젝트가 존재하지 않습니다."));
@@ -45,6 +48,7 @@ public class TeamAssignmentService {
                 .toList();
     }
 
+    @Transactional
     public TeamAssignmentDto.Res update(Long teamAssignmentId, TeamAssignmentDto.UpdateReq req) {
         TeamAssignment teamAssignment = teamAssignmentRepository.findById(teamAssignmentId)
                 .orElseThrow(() -> new IllegalArgumentException("과제가 존재하지 않습니다."));
@@ -53,6 +57,7 @@ public class TeamAssignmentService {
         return  toRes(teamAssignment);
     }
 
+    @Transactional
     public void delete(Long teamAssignmentId) {
         teamAssignmentRepository.deleteById(teamAssignmentId);
     }

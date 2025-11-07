@@ -13,11 +13,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PersonalAssignmentService {
 
     private final PersonalAssignmentRepository personalAssignmentRepository;
     private final TeamAssignmentRepository teamAssignmentRepository;
 
+    @Transactional
     public PersonalAssignmentDto.Res createFromTeam(PersonalAssignmentDto.CreateFromTeamReq req) {
         TeamAssignment teamAssignment = teamAssignmentRepository.findById(req.teamAssignmentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 과제입니다."));
@@ -34,6 +36,7 @@ public class PersonalAssignmentService {
         return toRes(personalAssignmentRepository.save(assignment));
     }
 
+    @Transactional
     public PersonalAssignmentDto.Res createOwn(PersonalAssignmentDto.CreateOwnReq req) {
         PersonalAssignment assignment = PersonalAssignment.builder()
                 .userId(req.userId())
@@ -65,6 +68,7 @@ public class PersonalAssignmentService {
         return toRes(assignment);
     }
 
+    @Transactional
     public void delete(Long id) {
         PersonalAssignment assignment = personalAssignmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("과제가 존재하지 않습니다."));

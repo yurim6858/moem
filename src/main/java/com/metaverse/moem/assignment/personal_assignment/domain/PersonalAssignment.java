@@ -4,7 +4,6 @@ import com.metaverse.moem.assignment.team_assignment.domain.TeamAssignment;
 import com.metaverse.moem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;

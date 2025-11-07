@@ -1,4 +1,4 @@
 gemini:
   api:
-    key: ${GEMINI_API_KEY}
+    key: ${GEMINI_API_KEY:}  # 환경 변수가 없으면 빈 문자열
   model: gemini-2.5-pro

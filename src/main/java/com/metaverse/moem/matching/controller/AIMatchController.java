@@ -1,6 +1,6 @@
 package com.metaverse.moem.matching.controller;
 
-import com.metaverse.moem.matching.domain.User;
+import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.matching.service.AIMatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +18,12 @@ public class AIMatchController {
     private final AIMatchService aiMatchService;
 
     @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return aiMatchService.getAllUsers();
+    public List<UserPost> getAllUsers() {
+        return aiMatchService.getAllUserPosts();
     }
 
     @PostMapping("/tags")
-    public List<User> getRecommendByTags(@RequestBody List<String> tags) {
+    public List<UserPost> getRecommendByTags(@RequestBody List<String> tags) {
         return aiMatchService.recommendByTags(tags);
     }
 

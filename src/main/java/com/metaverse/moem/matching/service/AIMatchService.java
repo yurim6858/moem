@@ -1,7 +1,7 @@
 package com.metaverse.moem.matching.service;
 
-import com.metaverse.moem.matching.domain.User;
-import com.metaverse.moem.matching.repository.UserRepository;
+import com.metaverse.moem.matching.domain.UserPost; // 💡 User 대신 UserPost 사용
+import com.metaverse.moem.matching.repository.UserPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -18,33 +18,33 @@ import java.util.stream.Collectors;
 @Profile({"default","mock"})
 public class AIMatchService {
 
-    private final UserRepository userRepository;
+    private final UserPostRepository userPostRepository;
     private final GeminiService geminiService;
 
-    public AIMatchService(UserRepository userRepository, 
-                         @Autowired(required = false) GeminiService geminiService) {
-        this.userRepository = userRepository;
+    public AIMatchService(UserPostRepository userPostRepository,
+                          @Autowired(required = false) GeminiService geminiService) {
+        this.userPostRepository = userPostRepository;
         this.geminiService = geminiService;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserPost> getAllUserPosts() {
+        return userPostRepository.findAll();
     }
 
-    public List<User> recommendByTags(List<String> tags) {
+    public List<UserPost> recommendByTags(List<String> tags) {
         log.debug("태그로 사용자 검색: {}", tags);
 
         if (tags == null || tags.isEmpty()) {
-            return getAllUsers();
+            return getAllUserPosts();
         }
 
         Set<String> lowerCaseTags = tags.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
-        return userRepository.findAll().stream()
-                .filter(user -> {
-                    Set<String> userSkills = user.getSkills().stream()
+        return userPostRepository.findAll().stream()
+                .filter(userPost -> {
+                    Set<String> userSkills = userPost.getSkills().stream()
                             .map(String::toLowerCase)
                             .collect(Collectors.toSet());
                     return userSkills.stream().anyMatch(lowerCaseTags::contains);
@@ -52,27 +52,26 @@ public class AIMatchService {
                 .toList();
     }
 
-    public String getAiRecommendationReason(Long userId) throws IOException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+    public String getAiRecommendationReason(Long userPostId) throws IOException {
+        UserPost userPost = userPostRepository.findById(userPostId)
+                .orElseThrow(() -> new NoSuchElementException("프로필 게시물을 찾을 수 없습니다: " + userPostId));
 
-        // GeminiService가 없는 경우 (mock 프로필 등) 기본 메시지 반환
         if (geminiService == null) {
             log.warn("GeminiService를 사용할 수 없습니다. 기본 메시지를 반환합니다.");
-            return String.format("이 팀원은 %s 기술을 보유하고 있어 프로젝트에 도움이 될 것입니다.", 
-                    String.join(", ", user.getSkills()));
+            return String.format("이 팀원은 %s 기술을 보유하고 있어 프로젝트에 도움이 될 것입니다.",
+                    String.join(", ", userPost.getSkills()));
         }
 
         String prompt = String.format(
                 "개발자 프로필: {이름: %s, 역할: %s, 보유 기술: %s, 소개: %s}. " +
                         "이 사람을 팀 프로젝트에 영입할 때의 핵심 장점 1가지를 '이 팀원은...'으로 시작하는 한 문장으로 요약해줘.",
-                user.getName(),
-                user.getRole(),
-                String.join(", ", user.getSkills()),
-                user.getNote()
+                userPost.getUsername(),
+                "개발자",
+                String.join(", ", userPost.getSkills()),
+                userPost.getIntro()
         );
 
-        log.info("Gemini 추천 이유 생성 요청: {}", user.getName());
+        log.info("Gemini 추천 이유 생성 요청: {}", userPost.getUsername());
         return geminiService.getCompletion(prompt);
     }
 }

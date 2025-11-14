@@ -1,11 +1,12 @@
 package com.metaverse.moem.matching.service;
 
-import com.metaverse.moem.matching.domain.UserPost; // 💡 User 대신 UserPost 사용
+import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.matching.repository.UserPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // 💡 Transactional 추가
 
 import java.io.IOException;
 import java.util.List;
@@ -52,9 +53,17 @@ public class AIMatchService {
                 .toList();
     }
 
+    @Transactional
     public String getAiRecommendationReason(Long userPostId) throws IOException {
         UserPost userPost = userPostRepository.findById(userPostId)
                 .orElseThrow(() -> new NoSuchElementException("프로필 게시물을 찾을 수 없습니다: " + userPostId));
+
+        String cachedSummary = userPost.getAiSummary();
+
+        if (cachedSummary != null && !cachedSummary.isEmpty()) {
+            log.info("AI Summary for Post ID {} loaded from cache (DB).", userPostId);
+            return cachedSummary;
+        }
 
         if (geminiService == null) {
             log.warn("GeminiService를 사용할 수 없습니다. 기본 메시지를 반환합니다.");
@@ -72,6 +81,11 @@ public class AIMatchService {
         );
 
         log.info("Gemini 추천 이유 생성 요청: {}", userPost.getUsername());
-        return geminiService.getCompletion(prompt);
+        String newSummary = geminiService.getCompletion(prompt);
+
+        userPost.setAiSummary(newSummary);
+        log.info("AI Summary for Post ID {} successfully generated and cached to DB.", userPostId);
+
+        return newSummary;
     }
 }

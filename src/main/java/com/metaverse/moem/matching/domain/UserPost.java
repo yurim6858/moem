@@ -20,6 +20,9 @@ public class UserPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
+    private String aiSummary;
+
     // 🔥 Auth와 1:1 연관관계 설정
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_id", nullable = false)

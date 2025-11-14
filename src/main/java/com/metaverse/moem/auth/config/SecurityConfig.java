@@ -21,11 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    // 주의: DEBUG 로그는 프로덕션에서 제거하는 것이 좋습니다.
-    // 필요시 application.yml에서 설정하세요.
 
     // 비밀번호 인코더 (BCrypt)를 Bean으로 등록
     @Bean
@@ -52,10 +49,19 @@ public class SecurityConfig {
                 )
                 // JWT 필터 추가 (UsernamePasswordAuthenticationFilter 전에 실행)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                
-                // 인가(Authorization, 엔드포인트의 접근 권한) 규칙 정의:
+
+                // 💡 인가(Authorization, 엔드포인트의 접근 권한) 규칙 정의:
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()  // 모든 요청 허용
+                        // 1. 인증/권한 없이 접근 가능한 경로 명시 (회원가입, 로그인, 매칭 API)
+                        .requestMatchers(
+                                "/api/auth/signup",
+                                "/api/auth/login",
+                                "/api/auth/reissue",
+                                "/api/match/**"  // 매칭 관련 API
+                        ).permitAll()
+
+                        // 2. 그 외 모든 요청은 인증(JWT 토큰)이 필요함
+                        .anyRequest().authenticated()
                 );
 
         return http.build();

@@ -34,6 +34,9 @@ public class ProjectPost {
 
     private LocalDateTime deadline;
 
+    @Column(columnDefinition = "TEXT")
+    private String aiRecommendationReason;
+
     // 🔥 작성자와 연관관계 설정 (Auth 직접 참조)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)

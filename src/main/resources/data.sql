@@ -311,3 +311,173 @@ VALUES (1001, 'HTML'),
        (1012, 'Kubernetes'),
        (1019, 'Docker'),
        (1019, 'AWS');
+
+-- 1. 외래 키 제약 조건 해제 (MySQL 기준)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 2. 관련 테이블의 데이터 초기화
+TRUNCATE TABLE project_tags;
+TRUNCATE TABLE project_positions;
+TRUNCATE TABLE project_posts;
+
+ALTER TABLE project_posts AUTO_INCREMENT = 1;
+
+-- 3. 외래 키 제약 조건 다시 활성화
+SET FOREIGN_KEY_CHECKS = 1;
+
+---
+-- =======================================================
+-- IV. PROJECT_POSTS (프로젝트 모집 게시물) 데이터 삽입 (50개)
+-- ai_recommendation_reason 필드는 모두 NULL로 설정
+-- =======================================================
+
+INSERT INTO project_posts (id, title, intro, description, deadline, ai_recommendation_reason, creator_id, work_style, contact_type, contact_value, collaboration_period, created_at, updated_at, is_deleted, is_recruitment_completed, team_id)
+VALUES
+    (1, 'React 기반 B2B SaaS 대시보드 개발', '타입스크립트를 사용한 클린 아키텍처 프론트엔드 프로젝트입니다.', '대규모 데이터를 효율적으로 시각화하고 관리하는 B2B SaaS 솔루션의 핵심 대시보드를 구축합니다.', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, 1, '원격', 'email', 'proj1@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (2, 'Java/Spring을 이용한 실시간 채팅 서비스 백엔드', 'Kafka를 활용하여 높은 처리량과 확장성을 갖춘 백엔드 시스템 설계.', '사용자 간의 실시간 메시징을 처리하는 채팅 서비스의 백엔드 아키텍처를 설계하고 구현합니다.', DATE_ADD(NOW(), INTERVAL 45 DAY), NULL, 2, '하이브리드', 'phone', '010-1234-0002', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (3, 'Pandas/Python 기반 금융 데이터 분석 모델 개발', '통계적 인사이트 도출 및 시각화를 위한 데이터 사이언스 팀.', '주식 및 금융 데이터를 분석하여 예측 모델을 개발하고, 그 결과를 내부 시스템에 통합합니다.', DATE_ADD(NOW(), INTERVAL 14 DAY), NULL, 3, '원격', 'kakao', 'proj3_data', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (4, 'HTML/CSS 웹 접근성 개선 프로젝트 (모집 완료)', '시각 장애인 및 저시력 사용자를 위한 웹 접근성 최적화 작업.', '기존 웹사이트의 HTML 마크업과 CSS 스타일을 수정하여 웹 표준 및 접근성 가이드라인을 준수합니다.', DATE_ADD(NOW(), INTERVAL -5 DAY), NULL, 4, '오프라인', 'email', 'proj4@moem.com', '1개월 미만', DATE_ADD(NOW(), INTERVAL -15 DAY), DATE_ADD(NOW(), INTERVAL -5 DAY), FALSE, TRUE, NULL),
+    (5, '풀스택 포트폴리오 프로젝트: 여행 기록 앱', '백엔드(Java/Spring)와 프론트엔드(Vue.js) 협업을 통한 MVP 개발.', '사용자가 다녀온 여행지를 기록하고 공유하는 풀스택 웹 애플리케이션을 제작합니다.', DATE_ADD(NOW(), INTERVAL 60 DAY), NULL, 5, '하이브리드', 'email', 'proj5@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (6, 'MSA 환경 구축 및 Docker/Kubernetes 도입', '서비스의 확장성과 안정성을 위한 인프라 구축 및 자동화.', '레거시 모놀리틱 시스템을 MSA로 전환하고, 배포 환경을 Docker와 K8S로 표준화합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 6, '원격', 'phone', '010-9999-0006', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (7, 'Next.js를 활용한 SSR 기반 이커머스 FE', '성능 최적화 및 SEO를 고려한 서버 사이드 렌더링 프론트엔드 개발.', '대형 이커머스 플랫폼의 상품 상세 페이지와 결제 흐름을 Next.js로 개발합니다.', DATE_ADD(NOW(), INTERVAL 35 DAY), NULL, 7, '오프라인', 'email', 'proj7@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (8, 'PyTorch 기반 딥러닝 모델 서비스 배포', '학습된 AI 모델을 API로 패키징하여 실제 서비스에 통합하는 MLOps 프로젝트.', '이미지 인식 모델의 성능 테스트부터 클라우드 환경 배포까지 전 과정을 담당합니다.', DATE_ADD(NOW(), INTERVAL 40 DAY), NULL, 8, '원격', 'kakao', 'proj8_ml', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (9, '애자일 방법론을 통한 신규 서비스 기획 (PM/PO)', '고객 니즈 분석부터 로드맵 수립까지 전 과정 리드.', '새로운 교육 서비스 앱의 기능 정의, 와이어프레임, 개발 우선순위를 결정할 PM/PO를 찾습니다.', DATE_ADD(NOW(), INTERVAL 90 DAY), NULL, 9, '하이브리드', 'email', 'proj9@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (10, 'Flutter 기반 크로스 플랫폼 모바일 앱 개발', '하나의 코드로 iOS와 Android 앱을 동시에 개발하는 프로젝트.', '헬스케어 서비스의 사용자 모바일 앱 UI/UX 및 기능을 개발합니다.', DATE_ADD(NOW(), INTERVAL 50 DAY), NULL, 10, '오프라인', 'phone', '010-1234-0010', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (11, 'Redux-Toolkit을 사용한 FE 상태관리 마이그레이션', '기존 Context API 기반의 상태관리를 Redux-Toolkit으로 전환합니다.', '대규모 프론트엔드 애플리케이션의 상태관리 구조를 효율적으로 개선하는 작업입니다.', DATE_ADD(NOW(), INTERVAL 15 DAY), NULL, 11, '원격', 'email', 'proj11@moem.com', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (12, 'AWS 기반 API Gateway 및 서버리스 백엔드 구축', 'Lambda, DynamoDB를 활용한 서버리스 아키텍처 설계 및 구현.', '고객 인증 및 결제 시스템의 백엔드를 서버리스 환경으로 구축합니다.', DATE_ADD(NOW(), INTERVAL 45 DAY), NULL, 12, '하이브리드', 'email', 'proj12@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (13, 'R을 활용한 통계적 A/B 테스트 플랫폼 구축', '마케팅 데이터 분석 및 A/B 테스트 결과를 제공하는 플랫폼 개발.', '통계 분석 결과를 시각화하고, 데이터 기반 의사결정을 지원하는 도구를 만듭니다.', DATE_ADD(NOW(), INTERVAL 25 DAY), NULL, 13, '오프라인', 'kakao', 'proj13_ab', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (14, 'Node.js/Express 기반 RESTful API 서버 개발', '빠른 개발 속도를 위한 Node.js 기반 백엔드 API 제작.', '신규 소셜 서비스의 백엔드 API 명세 정의 및 구현을 담당합니다.', DATE_ADD(NOW(), INTERVAL 60 DAY), NULL, 14, '원격', 'phone', '010-1234-0014', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (15, 'TypeScript와 GraphQL을 사용한 API 설계', '클라이언트-서버 간 효율적인 통신을 위한 GraphQL 도입 프로젝트.', '기존 REST API를 GraphQL로 전환하고, 타입스크립트로 안정성을 확보합니다.', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, 15, '하이브리드', 'email', 'proj15@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (16, '대규모 트래픽 처리를 위한 Java/JPA 성능 튜닝', '초당 수천 건의 요청을 처리하는 백엔드 시스템의 병목 현상 개선.', 'JPA 쿼리 최적화, Redis 캐싱 도입 등 성능 개선 작업을 진행합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 16, '오프라인', 'email', 'proj16@moem.com', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (17, 'Next.js 기반 웹사이트 SEO 및 성능 최적화', 'Next.js의 기능을 최대한 활용하여 검색 엔진 최적화(SEO)를 달성합니다.', '사이트의 Lighthouse 점수 개선 및 Core Web Vitals 지표를 높이는 것이 목표입니다.', DATE_ADD(NOW(), INTERVAL 10 DAY), NULL, 17, '원격', 'kakao', 'proj17_seo', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (18, 'Spring Cache 및 Redis 도입 프로젝트', '백엔드 서비스의 응답 속도 향상을 위한 데이터 캐싱 전략 구축.', 'Spring Boot 환경에서 Redis를 캐시 저장소로 설정하고 관리합니다.', DATE_ADD(NOW(), INTERVAL 25 DAY), NULL, 18, '하이브리드', 'phone', '010-1234-0018', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (19, 'Go 언어 기반 고성능 마이크로 서비스 개발', '확장성과 유지보수성을 고려한 신규 서비스의 핵심 모듈을 Go로 개발합니다.', '대용량 처리에 유리한 Go 언어의 장점을 살려 백엔드 시스템을 구축합니다.', DATE_ADD(NOW(), INTERVAL 40 DAY), NULL, 19, '원격', 'email', 'proj19@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (20, 'C++ 임베디드 시스템 펌웨어 개발', 'IoT 장비에 사용되는 임베디드 리눅스 기반 펌웨어 개발.', '하드웨어 제어 및 저수준 프로그래밍이 필요한 전문가를 찾습니다.', DATE_ADD(NOW(), INTERVAL 70 DAY), NULL, 20, '오프라인', 'email', 'proj20@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (21, 'TypeScript/Node.js 백엔드 API 개발 (모집 완료)', '모던 자바스크립트 기술 스택을 활용한 API 서버 구축.', '타입스크립트와 Node.js 기반으로 비즈니스 로직을 구현하는 프로젝트.', DATE_ADD(NOW(), INTERVAL -2 DAY), NULL, 21, '하이브리드', 'kakao', 'proj21_ts', '1개월 미만', DATE_ADD(NOW(), INTERVAL -10 DAY), DATE_ADD(NOW(), INTERVAL -2 DAY), FALSE, TRUE, NULL),
+    (22, 'Kotlin을 이용한 안드로이드 네이티브 앱 리뉴얼', '기존 레거시 안드로이드 앱을 Jetpack Compose 기반으로 전면 개편.', '최신 안드로이드 개발 트렌드를 적용하여 사용자 경험을 개선합니다.', DATE_ADD(NOW(), INTERVAL 55 DAY), NULL, 22, '원격', 'phone', '010-1234-0022', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (23, 'Hadoop/Spark 기반 빅데이터 파이프라인 구축', '대규모 로그 데이터를 수집, 처리, 분석하는 데이터 엔지니어링 프로젝트.', 'Hadoop, Spark를 활용하여 안정적인 데이터 파이프라인을 설계하고 운영합니다.', DATE_ADD(NOW(), INTERVAL 35 DAY), NULL, 23, '오프라인', 'email', 'proj23@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (24, '크로스 브라우징 및 웹 표준 준수 FE 퍼블리싱', '모든 브라우저와 디바이스에서 동일한 사용자 경험을 제공하는 퍼블리싱 작업.', '웹 표준 준수를 위한 HTML/CSS/Sass 코드를 작성하고 검증합니다.', DATE_ADD(NOW(), INTERVAL 15 DAY), NULL, 24, '하이브리드', 'email', 'proj24@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (25, '클라우드 인프라 자동화 (Terraform, AWS)', 'IaaS(Infrastructure as Code)를 위한 Terraform 스크립트 작성 및 관리.', 'AWS 환경에서 VPC, EC2, RDS 등의 자원을 Terraform으로 자동화합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 25, '원격', 'kakao', 'proj25_iac', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (26, 'Java Swing 기반 레거시 시스템 마이그레이션', 'Java Swing으로 만들어진 기존 시스템을 웹 기반으로 전환하는 프로젝트.', '레거시 시스템을 분석하고 새로운 아키텍처로 점진적으로 마이그레이션합니다.', DATE_ADD(NOW(), INTERVAL 70 DAY), NULL, 26, '오프라인', 'phone', '010-1234-0026', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (27, 'Webpack/Babel을 이용한 FE 빌드 최적화', '프론트엔드 빌드 속도 개선 및 번들 사이즈 최적화 작업.', '대규모 프로젝트의 Webpack 설정을 튜닝하여 빌드 시간을 단축합니다.', DATE_ADD(NOW(), INTERVAL 10 DAY), NULL, 27, '하이브리드', 'email', 'proj27@moem.com', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (28, 'Python Django/Flask를 활용한 교육 플랫폼 API', 'Python 기반의 웹 프레임워크를 사용하여 교육 콘텐츠 관리 API를 개발합니다.', '데이터 모델 설계부터 API 구현 및 테스트까지 전 과정을 담당합니다.', DATE_ADD(NOW(), INTERVAL 40 DAY), NULL, 28, '원격', 'email', 'proj28@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (29, 'React Native 기반 내부 관리자 앱 개발', '사내 업무 효율화를 위한 모바일 관리자 도구를 React Native로 개발.', 'iOS 및 Android 환경에서의 배포 및 유지보수 경험이 필요합니다.', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, 29, '오프라인', 'kakao', 'proj29_rn', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (30, 'MySQL 데이터베이스 성능 진단 및 튜닝', '대용량 트래픽에 대비한 MySQL 쿼리 튜닝 및 인덱스 최적화.', 'DBA 역할로 데이터베이스 성능을 분석하고 개선 방안을 도출합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 30, '하이브리드', 'phone', '010-1234-0030', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (31, 'Zustand 기반의 가벼운 FE 상태관리 도입', '무거운 Redux 대신 경량화된 Zustand 라이브러리를 사용하여 상태관리를 구현.', '신규 서비스에 적용할 효율적인 상태관리 구조를 설계합니다.', DATE_ADD(NOW(), INTERVAL 35 DAY), NULL, 31, '원격', 'email', 'proj31@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (32, 'Spring Cloud 기반 분산 환경 설정 자동화', 'Eureka와 Config Server를 사용하여 MSA 환경의 설정 관리를 자동화.', '대규모 분산 시스템의 안정적인 운영을 위한 인프라 구축입니다.', DATE_ADD(NOW(), INTERVAL 45 DAY), NULL, 32, '오프라인', 'email', 'proj32@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (33, 'NumPy를 활용한 데이터 전처리 모듈 개발', '머신러닝 모델 학습을 위한 대용량 데이터의 전처리 파이프라인 구축.', 'Python, Pandas, NumPy를 사용하여 데이터 클리닝 및 변환 작업을 담당합니다.', DATE_ADD(NOW(), INTERVAL 10 DAY), NULL, 33, '하이브리드', 'kakao', 'proj33_data', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (34, 'Java 기반 TDD(테스트 주도 개발) 실천 프로젝트', 'JUnit과 Mockito를 사용하여 높은 테스트 커버리지를 가진 백엔드 코드 작성.', '개발 초기부터 테스트를 고려하는 품질 높은 소프트웨어 개발을 목표로 합니다.', DATE_ADD(NOW(), INTERVAL 25 DAY), NULL, 34, '원격', 'phone', '010-1234-0034', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (35, 'Jenkins, GitLab CI를 이용한 CD 파이프라인 구축', 'Helm 차트를 활용하여 Kubernetes 환경으로 자동 배포하는 시스템 구축.', '빌드, 테스트, 배포 전 과정을 자동화하는 DevOps 역할을 담당합니다.', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, 35, '오프라인', 'email', 'proj35@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (36, 'Go 언어 기반 웹 스크래핑 및 데이터 수집 시스템', 'Go의 동시성 기능을 활용하여 고속으로 데이터를 수집하는 백엔드 개발.', '대용량 웹 데이터를 효율적으로 파싱하고 저장하는 시스템을 구축합니다.', DATE_ADD(NOW(), INTERVAL 50 DAY), NULL, 36, '하이브리드', 'email', 'proj36@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (37, 'Vercel에 배포할 Next.js 마케팅 웹사이트 개발', 'Next.js의 Static Generation 기능을 활용하여 빠르고 안정적인 마케팅 페이지를 개발.', '마케팅팀의 요구사항을 반영하여 랜딩 페이지를 구현합니다.', DATE_ADD(NOW(), INTERVAL 10 DAY), NULL, 37, '원격', 'kakao', 'proj37_vercel', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (38, 'Elasticsearch를 이용한 전문 검색 시스템 구축', '대용량 텍스트 데이터를 위한 Full-Text Search 엔진 설계 및 구현.', 'ELK 스택(Elasticsearch, Logstash, Kibana)을 활용하여 검색 기능을 개발합니다.', DATE_ADD(NOW(), INTERVAL 25 DAY), NULL, 38, '오프라인', 'phone', '010-1234-0038', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (39, 'MongoDB 기반 스키마 설계 및 데이터 마이그레이션', 'RDBMS에서 NoSQL(MongoDB)로 데이터베이스 전환 및 스키마 최적화.', 'MongoDB Mongoose ORM을 사용하여 데이터 접근 계층을 구현합니다.', DATE_ADD(NOW(), INTERVAL 40 DAY), NULL, 39, '하이브리드', 'email', 'proj39@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (40, 'OWASP TOP 10 기반 웹 보안 취약점 진단 및 개선', '기존 웹 서비스의 보안 취약점을 분석하고 방어 로직을 구현하는 보안 프로젝트.', '침투 테스트 및 보안 코딩 가이드라인 준수 작업을 수행합니다.', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, 40, '원격', 'email', 'proj40@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (41, '프로젝트 초기 세팅 및 기술 스택 결정 리드', '신규 서비스 개발팀의 PM 역할로 기술적 방향성을 설정하고 개발팀을 이끌어갈 리더.', '개발 환경 구성 및 협업 도구(JIRA, Confluence) 설정을 담당합니다.', DATE_ADD(NOW(), INTERVAL 15 DAY), NULL, 41, '오프라인', 'kakao', 'proj41_pm', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (42, '이커머스 결제/주문 시스템 모듈 개발 (모집 완료)', '안정적인 결제 흐름을 위한 백엔드 모듈 설계 및 PG사 연동.', '대규모 트랜잭션 처리가 가능한 주문 시스템을 개발합니다.', DATE_ADD(NOW(), INTERVAL -1 DAY), NULL, 42, '하이브리드', 'phone', '010-1234-0042', '2-3개월', DATE_ADD(NOW(), INTERVAL -20 DAY), DATE_ADD(NOW(), INTERVAL -10 DAY), FALSE, TRUE, NULL),
+    (43, '블록체인 기반 NFT 마켓플레이스 스마트 컨트랙트', 'Ethereum 블록체인 상에 NFT 발행 및 거래 로직을 Solidity로 구현.', 'Web3 기술에 대한 높은 이해도를 가진 개발자가 필요합니다.', DATE_ADD(NOW(), INTERVAL 60 DAY), NULL, 43, '원격', 'email', 'proj43@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (44, 'Unity/C# 기반 멀티플레이어 게임 서버 개발', '실시간 동기화 및 대규모 동시 접속을 처리하는 게임 서버 백엔드 개발.', 'Unity 클라이언트와의 통신 및 게임 로직을 C#으로 구현합니다.', DATE_ADD(NOW(), INTERVAL 75 DAY), NULL, 44, '오프라인', 'email', 'proj44@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (45, 'Vue.js/Vuetify를 사용한 관리자 페이지 리팩토링', '사용성이 개선된 Vue.js 기반의 새로운 관리자 페이지 UI/UX 개발.', '기존 관리자 페이지의 레거시 코드를 현대적인 프레임워크로 전환합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 45, '하이브리드', 'kakao', 'proj45_vue', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (46, '프론트엔드 성능 측정 도구 Lighthouse 적용', 'Lighthouse 점수를 지속적으로 모니터링하고 성능을 개선하는 작업.', '웹 성능 최적화에 초점을 맞춘 단기 프로젝트입니다.', DATE_ADD(NOW(), INTERVAL 10 DAY), NULL, 46, '원격', 'phone', '010-1234-0046', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (47, 'Spring WebFlux를 이용한 반응형(Reactive) 백엔드', '논블로킹 환경에서의 높은 동시성을 위한 Spring WebFlux 도입.', '이벤트 기반의 비동기 백엔드 서비스를 구축합니다.', DATE_ADD(NOW(), INTERVAL 45 DAY), NULL, 47, '오프라인', 'email', 'proj47@moem.com', '4-6개월', NOW(), NOW(), FALSE, FALSE, NULL),
+    (48, 'Kubeflow를 활용한 MLOps 파이프라인 자동화', '머신러닝 실험부터 모델 배포까지의 모든 과정을 Kubeflow로 자동화.', 'ML 모델의 지속적인 통합 및 배포(CI/CD) 환경을 구축합니다.', DATE_ADD(NOW(), INTERVAL 60 DAY), NULL, 48, '하이브리드', 'email', 'proj48@moem.com', '6개월 이상', NOW(), NOW(), FALSE, FALSE, NULL),
+    (49, '웹 보안: XSS/CSRF 방어 로직 구현 및 테스트', '웹 애플리케이션의 크로스 사이트 스크립팅 및 위조 공격 방어 모듈 개발.', '보안 취약점 진단 후, 안전한 코드를 작성하고 테스트하는 단기 프로젝트.', DATE_ADD(NOW(), INTERVAL 15 DAY), NULL, 49, '원격', 'kakao', 'proj49_sec', '1개월 미만', NOW(), NOW(), FALSE, FALSE, NULL),
+    (50, '데이터베이스 ERD 설계 및 정규화 컨설팅', '신규 서비스의 데이터베이스 ERD를 설계하고 정규화 수준을 결정하는 전문가 컨설팅.', 'PostgreSQL 또는 MySQL 환경에서의 최적화된 스키마 설계를 목표로 합니다.', DATE_ADD(NOW(), INTERVAL 20 DAY), NULL, 50, '오프라인', 'phone', '010-1234-0050', '2-3개월', NOW(), NOW(), FALSE, FALSE, NULL);
+
+---
+-- =======================================================
+-- V. PROJECT_TAGS (기술 스택 태그) 데이터 삽입 (50개 프로젝트별)
+-- (이 부분은 이전과 동일하게 유지됩니다.)
+-- =======================================================
+INSERT INTO project_tags (project_id, tag)
+VALUES
+    (1, 'React'), (1, 'TypeScript'), (1, 'SaaS'), (2, 'Java'), (2, 'Spring'), (2, 'Kafka'),
+    (3, 'Python'), (3, 'Pandas'), (3, 'ML'), (4, 'HTML'), (4, 'CSS'), (4, 'Accessibility'),
+    (5, 'Java'), (5, 'Spring'), (5, 'Vue.js'), (6, 'DevOps'), (6, 'Docker'), (6, 'Kubernetes'),
+    (7, 'Next.js'), (7, 'SSR'), (7, 'SEO'), (8, 'Python'), (8, 'PyTorch'), (8, 'MLOps'),
+    (9, 'PM'), (9, 'Agile'), (9, 'Scrum'), (10, 'Flutter'), (10, 'Dart'), (10, 'Mobile'),
+    (11, 'React'), (11, 'Redux-Toolkit'), (12, 'AWS'), (12, 'Lambda'), (12, 'DynamoDB'),
+    (13, 'R'), (13, 'Statistics'), (13, 'AB-Testing'), (14, 'Node.js'), (14, 'Express'), (14, 'REST-API'),
+    (15, 'TypeScript'), (15, 'GraphQL'), (16, 'Java'), (16, 'JPA'), (16, 'Redis'),
+    (17, 'Next.js'), (17, 'Lighthouse'), (17, 'Performance'), (18, 'Spring'), (18, 'Redis'), (19, 'Go'), (19, 'Microservices'),
+    (20, 'C++'), (20, 'Embedded'), (20, 'Linux'), (21, 'TypeScript'), (21, 'Node.js'),
+    (22, 'Kotlin'), (22, 'Android'), (22, 'Jetpack Compose'), (23, 'Hadoop'), (23, 'Spark'), (23, 'Data-Engineering'),
+    (24, 'HTML'), (24, 'CSS'), (24, 'Sass'), (25, 'AWS'), (25, 'Terraform'), (25, 'IaC'),
+    (26, 'Java'), (26, 'Legacy'), (26, 'Migration'), (27, 'React'), (27, 'Webpack'), (27, 'Babel'),
+    (28, 'Python'), (28, 'Django'), (28, 'Flask'), (29, 'React Native'), (29, 'Mobile'), (30, 'MySQL'), (30, 'SQL-Tuning'),
+    (31, 'React'), (31, 'Zustand'), (32, 'Spring Cloud'), (32, 'Eureka'), (32, 'Config'),
+    (33, 'Python'), (33, 'NumPy'), (33, 'Data-Preprocess'), (34, 'Java'), (34, 'JUnit'), (34, 'TDD'),
+    (35, 'Jenkins'), (35, 'GitLab CI'), (35, 'Helm'), (36, 'Go'), (36, 'Concurrency'), (36, 'Web-Scraping'),
+    (37, 'Next.js'), (37, 'Vercel'), (37, 'Static-Gen'), (38, 'Elasticsearch'), (38, 'ELK'), (38, 'Full-Text-Search'),
+    (39, 'MongoDB'), (39, 'NoSQL'), (39, 'Mongoose'), (40, 'Security'), (40, 'OWASP'), (40, 'Penetration-Test'),
+    (41, 'PM'), (41, 'JIRA'), (41, 'Confluence'), (42, 'Java'), (42, 'Spring'), (42, 'Payment'),
+    (43, 'Blockchain'), (43, 'Solidity'), (43, 'NFT'), (44, 'Unity'), (44, 'C#'), (44, 'Game-Server'),
+    (45, 'Vue.js'), (45, 'Vuetify'), (46, 'React'), (46, 'Lighthouse'), (47, 'Spring'), (47, 'WebFlux'), (47, 'Reactive'),
+    (48, 'Python'), (48, 'Kubeflow'), (48, 'MLOps'), (49, 'Security'), (49, 'XSS'), (49, 'CSRF'),
+    (50, 'SQL'), (50, 'ERD'), (50, 'Normalization'), (50, 'PostgreSQL'), (48, 'Kubernetes');
+
+---
+-- =======================================================
+-- VI. PROJECT_POSITIONS (모집 포지션 및 인원) 데이터 삽입 (50개 프로젝트별)
+-- (이 부분은 이전과 동일하게 유지됩니다.)
+-- =======================================================
+INSERT INTO project_positions (project_id, role, headcount)
+VALUES
+    (1, 'Front-end Developer (React/TS)', 2),
+    (2, 'Backend Developer (Java/Spring)', 2),
+    (2, 'DevOps Engineer', 1),
+    (3, 'Data Scientist', 1),
+    (4, 'Front-end Developer', 1),
+    (5, 'Full-stack Developer', 2),
+    (6, 'DevOps Engineer', 2),
+    (7, 'Front-end Developer (Next.js)', 2),
+    (8, 'MLOps Engineer', 1),
+    (9, 'Project Manager (PM/PO)', 1),
+    (10, 'Mobile Developer (Flutter)', 2),
+    (11, 'Front-end Developer (React)', 1),
+    (12, 'Backend Developer (Serverless/AWS)', 1),
+    (13, 'Data Analyst (R)', 1),
+    (14, 'Backend Developer (Node.js)', 2),
+    (15, 'Backend Developer (GraphQL)', 1),
+    (16, 'Backend Performance Engineer', 1),
+    (17, 'Front-end Developer (Next.js)', 1),
+    (18, 'Backend Developer (Redis)', 1),
+    (19, 'Backend Developer (Go)', 2),
+    (20, 'Embedded Developer (C++)', 1),
+    (21, 'Backend Developer (TS/Node)', 1),
+    (22, 'Android Developer (Kotlin/Compose)', 1),
+    (23, 'Data Engineer (Hadoop/Spark)', 2),
+    (24, 'Front-end Publisher', 1),
+    (25, 'DevOps Engineer (Terraform)', 1),
+    (26, 'Backend Developer (Migration)', 2),
+    (27, 'Front-end Build Engineer', 1),
+    (28, 'Backend Developer (Django/Flask)', 1),
+    (29, 'Mobile Developer (React Native)', 1),
+    (30, 'DBA / Backend Developer (MySQL)', 1),
+    (31, 'Front-end Developer (Zustand)', 1),
+    (32, 'Backend Engineer (Spring Cloud)', 1),
+    (33, 'Data Engineer (Python/NumPy)', 1),
+    (34, 'Backend Developer (TDD/Java)', 2),
+    (35, 'DevOps Engineer (CI/CD)', 2),
+    (36, 'Backend Developer (Go)', 1),
+    (37, 'Front-end Developer (Next.js)', 1),
+    (38, 'Backend Developer (Elasticsearch)', 1),
+    (39, 'Backend Developer (MongoDB)', 1),
+    (40, 'Security Engineer', 1),
+    (41, 'Project Manager (PM)', 1),
+    (42, 'Backend Developer (Payment)', 2),
+    (43, 'Blockchain Developer (Solidity)', 1),
+    (44, 'Game Server Developer (C#/Unity)', 1),
+    (45, 'Front-end Developer (Vue.js)', 1),
+    (46, 'Front-end Performance Analyst', 1),
+    (47, 'Backend Developer (WebFlux)', 1),
+    (48, 'MLOps Engineer (Kubeflow)', 1),
+    (49, 'Security Developer', 1),
+    (50, 'DBA / Data Modeler', 1),
+    -- 추가 포지션 (헤드 카운트 다양화를 위해)
+    (1, 'UX/UI Designer', 1),
+    (5, 'Database Expert', 1),
+    (7, 'Backend Developer', 1),
+    (20, 'Hardware Interface Engineer', 1),
+    (24, 'UX/UI Designer', 1),
+    (47, 'Front-end Developer', 1);

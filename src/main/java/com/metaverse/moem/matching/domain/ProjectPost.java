@@ -54,6 +54,20 @@ public class ProjectPost {
     @Column
     private String collaborationPeriod;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @ElementCollection
     @CollectionTable(name = "project_positions", joinColumns = @JoinColumn(name = "project_id"))
     @AttributeOverrides({

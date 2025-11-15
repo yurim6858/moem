@@ -1,5 +1,6 @@
 package com.metaverse.moem.matching.service;
 
+import com.metaverse.moem.gemini.service.GeminiService;
 import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.matching.repository.UserPostRepository;
 import lombok.extern.slf4j.Slf4j;

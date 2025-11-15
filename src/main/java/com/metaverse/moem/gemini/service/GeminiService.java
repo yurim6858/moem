@@ -1,4 +1,4 @@
-package com.metaverse.moem.matching.service;
+package com.metaverse.moem.gemini.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +33,16 @@ public class GeminiService {
             return callGeminiApi(prompt, model);
         } catch (Exception error) {
             log.error("Gemini API 호출 실패: {}", error.getMessage(), error);
+            throw new IOException("Gemini API 호출에 실패했습니다.", error);
+        }
+    }
+
+    public String generateContent(String systemPrompt, String userPrompt) throws IOException {
+        String fullPrompt = systemPrompt + "\n\n" + userPrompt;
+        try {
+            return getCompletion(fullPrompt);
+        } catch (Exception error) {
+            log.error("Gemini API (with System Prompt) 호출 실패: {}", error.getMessage(), error);
             throw new IOException("Gemini API 호출에 실패했습니다.", error);
         }
     }

@@ -25,9 +25,11 @@ public class ProjectMatchController {
     @GetMapping("/reason/{userId}/{projectId}")
     public ResponseEntity<String> getMatchReason(
             @PathVariable Long userId,
-            @PathVariable Long projectId) {
+            @PathVariable Long projectId
+    ) {
 
         String reason = projectMatchService.getMatchReasonForUser(userId, projectId);
         return ResponseEntity.ok(reason);
     }
+
 }

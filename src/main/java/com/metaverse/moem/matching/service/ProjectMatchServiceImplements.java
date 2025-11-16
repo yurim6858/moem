@@ -34,30 +34,38 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
             """;
 
     @Override
-    @Transactional // 쓰기(캐시 저장)와 읽기 모두 처리
+    @Transactional
     public String getMatchReasonForUser(Long userId, Long projectId) {
 
+        // 1. Auth ID (API Path의 userId)로 UserPost 엔티티를 조회합니다.
         UserPost seeker = userPostRepository.findByAuth_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 프로필을 찾을 수 없습니다: " + userId));
 
-        ProjectPost project = projectPostRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다: " + projectId));
+        // 2. 🔑 캐시 조회: UserPost의 Primary Key를 사용 (개인화 강제)
+        Long userPostId = seeker.getId(); // UserPost의 PK (예: A의 1051, B의 1052)
 
-        Optional<MatchRecommendationCache> cachedResult = cacheRepository.findByUserPostAndProjectPost(seeker, project);
+        // 명시적인 PK 기반 쿼리를 사용하여, B가 A의 캐시를 조회하는 상황을 방지합니다.
+        Optional<MatchRecommendationCache> cachedResult =
+                cacheRepository.findByUserPostIdAndProjectId(userPostId, projectId);
 
         if (cachedResult.isPresent()) {
+            // ✅ B 사용자의 요약본 (K)이 존재하면 반환
             return cachedResult.get().getReasonForProjectSeeker();
         } else {
+            // ❌ B 사용자의 요약본이 존재하지 않으면 (AI 호출 및 저장)
+
+            ProjectPost project = projectPostRepository.findById(projectId)
+                    .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다: " + projectId));
 
             try {
+                // ... (AI 호출 로직은 동일)
                 String seekerInfo = formatUserPostForAI(seeker);
                 String projectInfo = formatProjectPostForAI(project);
                 String prompt = "Seeker Profile:\n" + seekerInfo + "\n\nProject Details:\n" + projectInfo;
 
-                // 🔥 동기 호출 (API Latency 예상)
                 String matchReason = geminiService.generateContent(SYSTEM_PROMPT, prompt);
 
-                // 3. 캐시 저장
+                // 3. 캐시 저장: 새로 생성된 요약본을 정확한 엔티티와 함께 저장 (K 생성)
                 MatchRecommendationCache newCache = new MatchRecommendationCache(
                         null, seeker, project, null, matchReason, LocalDateTime.now(), LocalDateTime.now()
                 );
@@ -67,6 +75,7 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
                 return matchReason;
 
             } catch (Exception e) {
+                // 이 오류는 주로 Duplicate Entry 오류일 가능성이 높습니다.
                 System.err.println("❌ Gemini On-Demand 오류: " + e.getMessage());
                 return "AI 추천 이유 생성 중 오류가 발생했습니다: " + e.getMessage();
             }
@@ -79,7 +88,6 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
         UserPost seeker = userPostRepository.findByAuth_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 프로필을 찾을 수 없습니다: " + userId));
 
-        // Note: 이 메서드는 현재 매칭 점수가 없으므로, 단순히 캐시된 프로젝트를 나열합니다.
         List<MatchRecommendationCache> recommendations =
                 cacheRepository.findByUserPost(seeker);
 

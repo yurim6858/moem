@@ -8,6 +8,7 @@ FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE user_skills;
 TRUNCATE TABLE user_posts;
 TRUNCATE TABLE user;
+TRUNCATE TABLE match_recommendation_cache;
 
 ALTER TABLE user AUTO_INCREMENT = 51;
 

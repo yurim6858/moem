@@ -9,6 +9,7 @@ TRUNCATE TABLE user_skills;
 TRUNCATE TABLE user_posts;
 TRUNCATE TABLE user;
 TRUNCATE TABLE match_recommendation_cache;
+TRUNCATE TABLE contest;
 
 ALTER TABLE user AUTO_INCREMENT = 51;
 

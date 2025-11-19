@@ -58,7 +58,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/reissue",
                                 "/api/match/**",
-                                "/api/project-match/**"// 매칭 관련 API
+                                "/api/project-match/**",// 매칭 관련 API
+                                "/api/contests/**"
                         ).permitAll()
 
                         // 2. 그 외 모든 요청은 인증(JWT 토큰)이 필요함

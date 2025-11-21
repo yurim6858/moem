@@ -34,6 +34,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             @Param("status") String status,
             @Param("query") String query
     );
+
+    @Query("""
+        select project from Project project
+        where project.isDeleted = false
+          and (
+              project.projectEndDate is null
+              or project.projectEndDate >= current_date
+          )
+    """)
+    List<Project> findActiveProjects();
 }
 
 

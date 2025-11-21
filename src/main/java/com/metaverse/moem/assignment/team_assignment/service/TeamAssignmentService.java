@@ -69,7 +69,12 @@ public class TeamAssignmentService {
                 teamAssignment.getUserId(),
                 teamAssignment.getTitle(),
                 teamAssignment.getDescription(),
-                teamAssignment.getDueAt()
+                teamAssignment.getDueAt(),
+                teamAssignment.getStatus() != null ? teamAssignment.getStatus().name() : "TODO",
+                teamAssignment.getProgress(),
+                teamAssignment.getCompletedAt(),
+                teamAssignment.getDelayDays(),
+                teamAssignment.getCompletionNotes()
         );
     }
 }

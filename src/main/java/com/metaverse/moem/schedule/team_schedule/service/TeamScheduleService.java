@@ -5,12 +5,14 @@ import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRe
 import com.metaverse.moem.schedule.team_schedule.dto.TeamScheduleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TeamScheduleService {
 
     private final TeamAssignmentRepository teamAssignmentRepository;
@@ -21,14 +23,14 @@ public class TeamScheduleService {
         List<TeamAssignment> assignments = teamAssignmentRepository.findAllByProject_TeamId(teamId);
 
         return assignments.stream()
-                .map(a -> new TeamScheduleDto.Res(
-                        a.getId(),
-                        a.getTitle(),
-                        a.getDescription(),
-                        a.getDueAt(),
-                        a.getUserId(),
-                        a.getCreatedAt(),
-                        calculateStatus(a.getDueAt(),a.getCreatedAt(),now)
+                .map(teamAssignment -> new TeamScheduleDto.Res(
+                        teamAssignment.getId(),
+                        teamAssignment.getTitle(),
+                        teamAssignment.getDescription(),
+                        teamAssignment.getDueAt(),
+                        teamAssignment.getUserId(),
+                        teamAssignment.getCreatedAt(),
+                        calculateStatus(teamAssignment.getDueAt(), teamAssignment.getCreatedAt(), now)
                 ))
                 .toList();
     }
@@ -52,7 +54,6 @@ public class TeamScheduleService {
 
         return TeamScheduleDto.AssignmentStatus.여유;
     }
-
 
 
 }

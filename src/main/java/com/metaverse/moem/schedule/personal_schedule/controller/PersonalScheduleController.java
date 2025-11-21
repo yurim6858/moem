@@ -1,6 +1,5 @@
 package com.metaverse.moem.schedule.personal_schedule.controller;
 
-
 import com.metaverse.moem.schedule.personal_schedule.dto.PersonalScheduleDto;
 import com.metaverse.moem.schedule.personal_schedule.service.PersonalScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +21,5 @@ public class PersonalScheduleController {
     public List<PersonalScheduleDto.Res> getSchedules(@PathVariable Long userId) {
         return personalScheduleService.getSchedules(userId);
     }
-
 
 }

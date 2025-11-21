@@ -2,7 +2,7 @@ package com.metaverse.moem.assignment.team_assignment.service;
 
 import com.metaverse.moem.assignment.team_assignment.domain.TeamAssignment;
 import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRepository;
-import com.metaverse.moem.matching.service.GeminiService;
+import com.metaverse.moem.gemini.service.GeminiService;
 import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;

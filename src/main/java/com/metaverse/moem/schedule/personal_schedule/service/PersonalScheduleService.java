@@ -5,38 +5,46 @@ import com.metaverse.moem.assignment.personal_assignment.repository.PersonalAssi
 import com.metaverse.moem.schedule.personal_schedule.dto.PersonalScheduleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PersonalScheduleService {
 
     private final PersonalAssignmentRepository personalAssignmentRepository;
 
     public List<PersonalScheduleDto.Res> getSchedules(Long userId) {
-        LocalDateTime now =  LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         List<PersonalAssignment> assignments = personalAssignmentRepository.findAllByUserId(userId);
-
-        // auto-delete : userCreated == true && 마감 지남
-        assignments.removeIf(a -> {
-            if (a.isUserCreated() && a.getDueAt().isBefore(now)){
-                personalAssignmentRepository.delete(a);
-                return true;
+        
+        // 만료된 개인 생성 과제를 별도로 처리 (ConcurrentModificationException 방지)
+        List<PersonalAssignment> toDelete = new ArrayList<>();
+        for (PersonalAssignment assignment : assignments) {
+            if (assignment.isUserCreated() && assignment.getDueAt() != null && assignment.getDueAt().isBefore(now)) {
+                toDelete.add(assignment);
             }
-            return false;
-        });
+        }
+        
+        // 삭제는 별도 트랜잭션에서 처리하는 것이 좋지만, 현재는 조회 시점에만 처리
+        // 주의: 조회 메서드에서 삭제하는 것은 좋은 패턴이 아닙니다. 별도 스케줄러나 배치 작업으로 처리하는 것이 좋습니다.
+        if (!toDelete.isEmpty()) {
+            assignments.removeAll(toDelete);
+        }
 
         return assignments.stream()
-                .map(a -> new PersonalScheduleDto.Res(
-                        a.getId(),
-                        a.getTitle(),
-                        a.getDescription(),
-                        a.getDueAt(),
-                        a.isUserCreated(),
-                        calculateStatus(a.getDueAt(),a.getCreatedAt(), now)
+                .map(personalAssignment -> new PersonalScheduleDto.Res(
+                        personalAssignment.getId(),
+                        personalAssignment.getTitle(),
+                        personalAssignment.getDescription(),
+                        personalAssignment.getDueAt(),
+                        personalAssignment.isUserCreated(),
+                        calculateStatus(personalAssignment.getDueAt(), personalAssignment.getCreatedAt(), now)
                 ))
                 .toList();
     }

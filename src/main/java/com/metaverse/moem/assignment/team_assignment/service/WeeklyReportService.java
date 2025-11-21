@@ -6,7 +6,7 @@ import com.metaverse.moem.assignment.team_assignment.domain.WeeklyReport;
 import com.metaverse.moem.assignment.team_assignment.dto.WeeklyReportDto;
 import com.metaverse.moem.assignment.team_assignment.repository.TeamAssignmentRepository;
 import com.metaverse.moem.assignment.team_assignment.repository.WeeklyReportRepository;
-import com.metaverse.moem.matching.service.GeminiService;
+import com.metaverse.moem.gemini.service.GeminiService;
 import com.metaverse.moem.project.domain.Project;
 import com.metaverse.moem.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;

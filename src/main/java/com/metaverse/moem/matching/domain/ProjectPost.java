@@ -34,6 +34,9 @@ public class ProjectPost {
 
     private LocalDateTime deadline;
 
+    @Column(columnDefinition = "TEXT")
+    private String aiRecommendationReason;
+
     // 🔥 작성자와 연관관계 설정 (Auth 직접 참조)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
@@ -51,6 +54,20 @@ public class ProjectPost {
     @Column
     private String collaborationPeriod;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @ElementCollection
     @CollectionTable(name = "project_positions", joinColumns = @JoinColumn(name = "project_id"))
     @AttributeOverrides({
@@ -63,6 +80,32 @@ public class ProjectPost {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+    
+    @Column(nullable = false)
+    private boolean isDeleted = false;  // Soft delete를 위한 필드
+    
+    @Column(nullable = false)
+    private boolean isRecruitmentCompleted = false;  // 모집 완료 여부
+
+    // 편의 메서드: 삭제 표시
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+
+    // 편의 메서드: 삭제 여부 확인
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+    
+    // 편의 메서드: 모집 완료 표시
+    public void setRecruitmentCompleted(boolean completed) {
+        this.isRecruitmentCompleted = completed;
+    }
+    
+    // 편의 메서드: 모집 완료 여부 확인
+    public boolean isRecruitmentCompleted() {
+        return isRecruitmentCompleted;
+    }
 
     // 🔥 편의 메서드 추가
     public String getCreatorUsername() {

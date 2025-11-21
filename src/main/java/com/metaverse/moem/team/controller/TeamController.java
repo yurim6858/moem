@@ -1,8 +1,13 @@
 package com.metaverse.moem.team.controller;
 
+import com.metaverse.moem.auth.domain.User;
+import com.metaverse.moem.auth.repository.UserRepository;
+import com.metaverse.moem.project.domain.Project;
+import com.metaverse.moem.project.repository.ProjectRepository;
 import com.metaverse.moem.team.dto.TeamDto;
 import com.metaverse.moem.team.service.TeamService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,32 +16,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/teams")
+@RequiredArgsConstructor
 public class TeamController {
 
     private final TeamService teamService;
-
-    public TeamController(TeamService teamService) {
-        this.teamService = teamService;
-    }
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
 
 
-    // 팀 생성
-    // 현재 JPA가 PK를 자동생성(@GeneratedValue) 하므로 teamId 경로값은 사용하지 않음
-    // 라우팅 일치 목적
-
-    @PostMapping("/{teamId}")
+    @PostMapping("/projects/{projectId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public TeamDto.Res create(@PathVariable Long teamId, @RequestBody @Valid TeamDto.CreateReq req) {
-        return teamService.create(req);
+    public TeamDto.Res create(@PathVariable Long projectId,
+                              @RequestBody @Valid TeamDto.CreateReq req) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
+        return teamService.create(project, req);
     }
 
-    // 팀 수정
     @PutMapping("/{teamId}")
-    public TeamDto.Res update(@PathVariable Long teamId, @RequestBody @Valid TeamDto.UpdateReq req) {
+    public TeamDto.Res update(@PathVariable Long teamId,
+                              @RequestBody @Valid TeamDto.UpdateReq req) {
         return teamService.update(teamId, req);
     }
 
-    // 팀 삭제
     @DeleteMapping("/{teamId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long teamId) {
@@ -48,55 +50,57 @@ public class TeamController {
         return teamService.list();
     }
 
-    // 내가 속한 팀 목록 조회
+    // 구체적인 경로를 먼저 선언 (Spring 경로 매칭 우선순위)
     @GetMapping("/my")
-    public ResponseEntity<List<TeamDto.Res>> getMyTeams(@RequestHeader("X-Username") String username) {
-        try {
-            List<TeamDto.Res> teams = teamService.getMyTeams(username);
-            return ResponseEntity.ok(teams);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+    public ResponseEntity<List<TeamDto.Res>> getMyTeams(@RequestHeader(value = "X-Username", required = false) String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username));
+        
+        List<TeamDto.Res> myTeams = teamService.getMyTeams(user.getId());
+        return ResponseEntity.ok(myTeams);
     }
 
-    // 팀 상세 정보 조회 (멤버 포함)
-    @GetMapping("/{teamId}/info")
-    public ResponseEntity<TeamDto.DetailRes> getTeamInfo(@PathVariable Long teamId) {
-        try {
-            TeamDto.DetailRes teamInfo = teamService.getTeamInfo(teamId);
-            return ResponseEntity.ok(teamInfo);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    // 프로젝트 시작 준비 상태 확인
+    // 프로젝트 시작 준비 상태 확인 (구체적인 경로를 먼저)
     @GetMapping("/{teamId}/start-ready/{projectId}")
     public ResponseEntity<TeamDto.StartReadyRes> checkStartReady(@PathVariable Long teamId, @PathVariable Long projectId) {
-        try {
-            TeamDto.StartReadyRes startReady = teamService.checkStartReady(teamId, projectId);
-            return ResponseEntity.ok(startReady);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        TeamDto.StartReadyRes startReady = teamService.checkStartReady(teamId, projectId);
+        return ResponseEntity.ok(startReady);
+    }
+
+    // 팀 상세 정보 조회 (RESTful 스타일) - 변수 경로는 가장 마지막에
+    @GetMapping("/{teamId}")
+    public ResponseEntity<TeamDto.DetailRes> getTeamDetail(@PathVariable Long teamId) {
+        TeamDto.DetailRes teamInfo = teamService.getTeamInfo(teamId);
+        return ResponseEntity.ok(teamInfo);
+    }
+
+    // 팀 상세 정보 조회 (하위 호환성을 위해 유지, deprecated)
+    @GetMapping("/{teamId}/info")
+    @Deprecated
+    public ResponseEntity<TeamDto.DetailRes> getTeamInfo(@PathVariable Long teamId) {
+        TeamDto.DetailRes teamInfo = teamService.getTeamInfo(teamId);
+        return ResponseEntity.ok(teamInfo);
     }
 
     // 프로젝트 시작
     @PostMapping("/{teamId}/start-project")
-    public ResponseEntity<String> startProject(@PathVariable Long teamId, @RequestBody TeamDto.StartProjectReq req) {
-        try {
-            teamService.startProject(teamId, req.projectId());
-            return ResponseEntity.ok("프로젝트가 성공적으로 시작되었습니다!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("프로젝트 시작 중 오류가 발생했습니다.");
+    public ResponseEntity<com.metaverse.moem.project.dto.ProjectDto.Res> startProject(
+            @PathVariable Long teamId,
+            @RequestBody @Valid TeamDto.StartProjectReq req,
+            @RequestHeader(value = "X-Username", required = false) String username) {
+        
+        if (username == null || username.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username));
+        
+        com.metaverse.moem.project.dto.ProjectDto.Res project = teamService.startProject(teamId, req.projectId(), user.getId());
+        return ResponseEntity.ok(project);
     }
 }

@@ -27,6 +27,17 @@ public class TeamAssignmentDto {
             Long userId,
             String title,
             String description,
-            LocalDateTime dueAt
+            LocalDateTime dueAt,
+            String status,
+            Integer progress,
+            LocalDateTime completedAt,
+            Integer delayDays,
+            String completionNotes
+    ) {}
+
+    public record UpdateStatusReq(
+            String status,
+            Integer progress,
+            String completionNotes
     ) {}
 }

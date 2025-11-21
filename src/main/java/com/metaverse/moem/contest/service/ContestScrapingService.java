@@ -108,6 +108,10 @@ public class ContestScrapingService {
     }
 
     private LocalDate parseDeadline(String dDayText) {
+        if (dDayText == null || dDayText.isBlank()) {
+            return null;
+        }
+
         Matcher matcher = D_DAY_PATTERN.matcher(dDayText);
 
         if (matcher.find()) {
@@ -120,7 +124,8 @@ public class ContestScrapingService {
             return null; // D+ 는 이미 마감
         }
 
-        if (dDayText.contains("D-0")) {
+        // D-0 패턴도 위 정규식으로 매칭되지만, 명시적으로 처리
+        if (dDayText.trim().equals("D-0") || dDayText.trim().equals("D-day")) {
             return LocalDate.now();
         }
 

@@ -41,6 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
+        String requestMethod = request.getMethod();
+
+        // 💡 OPTIONS 요청(CORS preflight)은 JWT 검증을 건너뛰고 즉시 통과
+        if ("OPTIONS".equalsIgnoreCase(requestMethod)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // 💡 1. EXCLUDE_URLS에 해당하는 경로라면 JWT 검증을 건너뛰고 다음 필터로 즉시 진행
         if (EXCLUDE_URLS.contains(requestUri)) {

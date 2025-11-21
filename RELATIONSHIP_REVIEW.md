@@ -135,7 +135,9 @@
 - [x] Application.applicant는 항상 존재 (nullable = false)
 - [x] Team.project는 항상 존재 (nullable = false, unique = true)
 - [x] TeamMembers.team은 항상 존재 (nullable = false)
-- [ ] TeamMembers 삭제 시 TeamMemberLeaveRequest 처리
-- [ ] ProjectPost 삭제 시 Application 처리
-- [ ] User 삭제 시 연관 엔티티 처리
+- [x] TeamMembers 삭제 시 TeamMemberLeaveRequest 처리 (TeamMembersService.delete()에서 처리)
+- [x] ProjectPost 삭제 시 Application 처리 (ProjectPostService.delete()에서 처리)
+- [x] User 삭제 시 연관 엔티티 처리 (UserService.deleteUser()에서 처리)
+- [x] Team 삭제 시 ProjectPost 처리 (TeamService.delete()에서 처리)
+- [x] team_invitations 테이블 정리 (DatabaseCleanupConfig에서 자동 처리)
 

@@ -1,6 +1,7 @@
 package com.metaverse.moem.auth.config;
 
 import com.metaverse.moem.auth.filter.JwtAuthenticationFilter;
+import com.metaverse.moem.config.CorsConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CorsConfig corsConfig;
 
     // 비밀번호 인코더 (BCrypt)를 Bean으로 등록
     @Bean
@@ -40,7 +42,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -52,6 +54,9 @@ public class SecurityConfig {
 
                 // 💡 인가(Authorization, 엔드포인트의 접근 권한) 규칙 정의:
                 .authorizeHttpRequests(authorize -> authorize
+                        // 0. OPTIONS 요청(CORS preflight)은 항상 허용
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        
                         // 1. 인증/권한 없이 접근 가능한 경로 명시 (회원가입, 로그인, 매칭 API)
                         .requestMatchers(
                                 "/api/auth/signup",

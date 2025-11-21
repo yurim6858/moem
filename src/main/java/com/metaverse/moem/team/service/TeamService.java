@@ -54,9 +54,24 @@ public class TeamService {
     }
 
     public void delete(Long id) {
-        if (!teamRepository.existsById(id)) {
-            throw new IllegalArgumentException("팀을 찾을 수 없습니다. id = " + id);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다. id = " + id));
+
+        // Team 삭제 전에 관련된 ProjectPost.team_id를 null로 설정
+        try {
+            Optional<ProjectPost> projectPostOpt = projectPostRepository.findByTeam_Id(id);
+            if (projectPostOpt.isPresent()) {
+                ProjectPost projectPost = projectPostOpt.get();
+                // ProjectPost의 team_id를 null로 설정
+                projectPost.setTeam(null);
+                projectPostRepository.save(projectPost);
+            }
+        } catch (Exception e) {
+            // ProjectPost 처리 실패 시에도 계속 진행 (로깅만)
+            System.err.println("ProjectPost 처리 중 오류 발생: " + e.getMessage());
         }
+
+        // Team 삭제 (CascadeType.ALL로 인해 TeamMembers, Meeting도 함께 삭제됨)
         teamRepository.deleteById(id);
     }
 

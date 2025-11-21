@@ -7,7 +7,6 @@ import com.metaverse.moem.matching.domain.UserPost;
 import com.metaverse.moem.matching.repository.MatchRecommendationCacheRepository;
 import com.metaverse.moem.matching.repository.ProjectPostRepository;
 import com.metaverse.moem.matching.repository.UserPostRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +16,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ProjectMatchServiceImplements implements ProjectMatchService {
 
     private final UserPostRepository userPostRepository;
     private final ProjectPostRepository projectPostRepository;
     private final MatchRecommendationCacheRepository cacheRepository;
-    private final GeminiService geminiService;
+    private final Optional<GeminiService> geminiService;
+
+    public ProjectMatchServiceImplements(
+            UserPostRepository userPostRepository,
+            ProjectPostRepository projectPostRepository,
+            MatchRecommendationCacheRepository cacheRepository,
+            Optional<GeminiService> geminiService) {
+        this.userPostRepository = userPostRepository;
+        this.projectPostRepository = projectPostRepository;
+        this.cacheRepository = cacheRepository;
+        this.geminiService = geminiService;
+    }
 
     private static final String SYSTEM_PROMPT = """
             당신은 최고의 프로젝트/인력 매칭 전문가입니다.
@@ -63,12 +72,24 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
                 String projectInfo = formatProjectPostForAI(project);
                 String prompt = "Seeker Profile:\n" + seekerInfo + "\n\nProject Details:\n" + projectInfo;
 
-                String matchReason = geminiService.generateContent(SYSTEM_PROMPT, prompt);
+                String matchReason = geminiService
+                        .map(service -> {
+                            try {
+                                return service.generateContent(SYSTEM_PROMPT, prompt);
+                            } catch (Exception e) {
+                                throw new RuntimeException("Gemini API 호출 실패", e);
+                            }
+                        })
+                        .orElse("이 프로젝트는 당신의 기술 스택과 경력이 잘 맞아 보입니다.");
 
                 // 3. 캐시 저장: 새로 생성된 요약본을 정확한 엔티티와 함께 저장 (K 생성)
-                MatchRecommendationCache newCache = new MatchRecommendationCache(
-                        null, seeker, project, null, matchReason, LocalDateTime.now(), LocalDateTime.now()
-                );
+                // @PrePersist가 createdAt과 updatedAt을 자동 설정하므로 null로 설정
+                MatchRecommendationCache newCache = new MatchRecommendationCache();
+                newCache.setUserPost(seeker);
+                newCache.setProjectPost(project);
+                newCache.setReasonForProjectSeeker(matchReason);
+                // reasonForProjectOwner는 null로 유지 (필요시 나중에 설정)
+                // createdAt과 updatedAt은 @PrePersist에서 자동 설정됨
                 cacheRepository.save(newCache);
 
                 System.out.println("✅ AI On-Demand Success: User ID " + userId + " matched with Project ID " + projectId);

@@ -59,6 +59,9 @@ public class SecurityConfig {
                                 "/api/auth/reissue",
                                 "/api/match/**",
                                 "/api/project-match/**",// 매칭 관련 API
+                                "/api/contests/**",
+                                "/api/project-match/reason/**",
+                                "/api/projects/**",
                                 "/api/contests/**"
                         ).permitAll()
 

@@ -9,6 +9,7 @@ import com.metaverse.moem.matching.repository.ProjectPostRepository;
 import com.metaverse.moem.matching.repository.UserPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
     private final ProjectPostRepository projectPostRepository;
     private final MatchRecommendationCacheRepository cacheRepository;
     private final GeminiService geminiService;
+    private final MatchCacheHelperService cacheHelperService;
 
     private static final String SYSTEM_PROMPT = """
             당신은 최고의 프로젝트/인력 매칭 전문가입니다.
@@ -37,47 +39,40 @@ public class ProjectMatchServiceImplements implements ProjectMatchService {
     @Transactional
     public String getMatchReasonForUser(Long userId, Long projectId) {
 
-        // 1. Auth ID (API Path의 userId)로 UserPost 엔티티를 조회합니다.
         UserPost seeker = userPostRepository.findByAuth_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 프로필을 찾을 수 없습니다: " + userId));
 
-        // 2. 🔑 캐시 조회: UserPost의 Primary Key를 사용 (개인화 강제)
-        Long userPostId = seeker.getId(); // UserPost의 PK (예: A의 1051, B의 1052)
-
-        // 명시적인 PK 기반 쿼리를 사용하여, B가 A의 캐시를 조회하는 상황을 방지합니다.
+        Long userPostId = seeker.getId();
         Optional<MatchRecommendationCache> cachedResult =
                 cacheRepository.findByUserPostIdAndProjectId(userPostId, projectId);
 
         if (cachedResult.isPresent()) {
-            // ✅ B 사용자의 요약본 (K)이 존재하면 반환
             return cachedResult.get().getReasonForProjectSeeker();
         } else {
-            // ❌ B 사용자의 요약본이 존재하지 않으면 (AI 호출 및 저장)
 
             ProjectPost project = projectPostRepository.findById(projectId)
                     .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다: " + projectId));
 
+            String matchReason;
             try {
-                // ... (AI 호출 로직은 동일)
                 String seekerInfo = formatUserPostForAI(seeker);
                 String projectInfo = formatProjectPostForAI(project);
                 String prompt = "Seeker Profile:\n" + seekerInfo + "\n\nProject Details:\n" + projectInfo;
 
-                String matchReason = geminiService.generateContent(SYSTEM_PROMPT, prompt);
+                matchReason = geminiService.generateContent(SYSTEM_PROMPT, prompt);
+            } catch (Exception e) {
+                System.err.println("❌ Gemini On-Demand 호출 오류: " + e.getMessage());
+                // AI 호출 실패는 DB와 무관하므로 트랜잭션을 롤백시키지 않습니다.
+                throw new RuntimeException("AI 추천 이유 생성 중 API 오류가 발생했습니다.", e);
+            }
 
-                // 3. 캐시 저장: 새로 생성된 요약본을 정확한 엔티티와 함께 저장 (K 생성)
-                MatchRecommendationCache newCache = new MatchRecommendationCache(
-                        null, seeker, project, null, matchReason, LocalDateTime.now(), LocalDateTime.now()
-                );
-                cacheRepository.save(newCache);
-
-                System.out.println("✅ AI On-Demand Success: User ID " + userId + " matched with Project ID " + projectId);
-                return matchReason;
+            try {
+                System.out.println("AI 호출 성공. 저장 로직을 Helper Service로 위임합니다.");
+                return cacheHelperService.saveAndHandleConcurrency(seeker, project, matchReason);
 
             } catch (Exception e) {
-                // 이 오류는 주로 Duplicate Entry 오류일 가능성이 높습니다.
-                System.err.println("❌ Gemini On-Demand 오류: " + e.getMessage());
-                return "AI 추천 이유 생성 중 오류가 발생했습니다: " + e.getMessage();
+                System.err.println("❌ AI 추천 최종 처리 중 오류: " + e.getMessage());
+                throw new RuntimeException("AI 추천 정보를 처리하는 중 예상치 못한 오류가 발생했습니다.", e);
             }
         }
     }
